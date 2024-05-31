@@ -33,8 +33,8 @@ def create_tables():
                  issue_id INTEGER,
                  FOREIGN KEY(inspector_id) REFERENCES employees(employee_id),
                  FOREIGN KEY(issue_id) REFERENCES reported_problems(id))''')
-    # c.execute("INSERT INTO employees VALUES ('manager1', 'password', 'Manager', 'manager1@example.com', '9380142763', 0, 0)")
-    # c.execute("INSERT INTO employees VALUES ('inspector1', 'password', 'Water Inspector', 'inspector1@example.com', '9113518404', 0, 0)")
+    # c.execute("INSERT INTO employees VALUES ('manager1','Manager 1', 'password', 'Manager', 'manager1@example.com', '9380142763', 0, 0)")
+    # c.execute("INSERT INTO employees VALUES ('inspector1','Inspector 1', 'password', 'Water Inspector', 'inspector1@example.com', '9113518404', 0, 0)")
     
     conn.commit()
     conn.close()
@@ -411,6 +411,67 @@ def change_password():
     flash('Please log in to access this page', 'error')
     return redirect(url_for('login'))
 
+@app.route('/register_manager', methods=['GET', 'POST'])
+def register_manager():
+    if request.method == 'POST':
+        id = request.form['id']
+        name = request.form['name']
+        email = request.form['email']
+        password = request.form['password']
+        mobile = request.form['mobile']
+
+        conn = sqlite3.connect('waruna.db')
+        c = conn.cursor()
+        c.execute("INSERT INTO employees (employee_id, name, email, password, mobile_no, role) VALUES (?, ?, ?, ?, ?, ?)",
+                  (id, name, email, password, mobile, 'Manager'))
+        conn.commit()
+        conn.close()
+
+        flash('Manager registered successfully', 'success')
+        return redirect(url_for('dashboard'))
+
+    return render_template('register_manager.html')
+
+
+@app.route('/register_inspector', methods=['GET', 'POST'])
+def register_inspector():
+    if request.method == 'POST':
+        id = request.form['id']
+        name = request.form['name']
+        email = request.form['email']
+        password = request.form['password']
+        mobile = request.form['mobile']
+
+        conn = sqlite3.connect('waruna.db')
+        c = conn.cursor()
+        c.execute("INSERT INTO employees (employee_id, name, email, password, mobile_no, role) VALUES (?, ?, ?, ?, ?, ?)",
+                  (id, name, email, password, mobile, 'Water Inspector'))
+        conn.commit()
+        conn.close()
+
+        flash('Inspector registered successfully', 'success')
+        return redirect(url_for('dashboard'))
+
+    return render_template('register_inspector.html')
+
+@app.route('/delete_employee', methods=['GET', 'POST'])
+def delete_employee():
+    if request.method == 'POST':
+        employee_id = request.form.get('employee_id')
+        if employee_id:
+            conn = sqlite3.connect('waruna.db')
+            c = conn.cursor()
+            c.execute("DELETE FROM employees WHERE employee_id = ?", (employee_id,))
+            conn.commit()
+            conn.close()
+
+            flash('Employee deleted successfully', 'success')
+            return redirect(url_for('dashboard'))  # Redirect to wherever appropriate
+        else:
+            flash('Please provide an employee ID', 'error')
+            return redirect(url_for('delete_employee'))
+
+    return render_template('delete_employee.html')
 
 if __name__ == "__main__":
     app.run(port=5001, debug=True)  

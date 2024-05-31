@@ -100,10 +100,49 @@
                 background-position-x: 1000px;
             }
         }
+        .flash-messages {
+            background-color: #28a745;
+            color: #fff;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+    
+        .flash-messages ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+    
+        .flash-messages .close {
+            color: #fff;
+            float: right;
+            font-size: 20px;
+            cursor: pointer;
+        }
+    
+        .flash-messages .close:hover {
+            color: #000;
+        }
         
     </style>
 </head>
 <body>
+<!-- Flash messages -->
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<div id="flash-messages" class="flash-messages">
+    <ul>
+        {% for message in messages %}
+        <li>
+            <span class="close">&times;</span>
+            {{ message }}
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+{% endwith %}
 
     
     <div class="container">
@@ -123,5 +162,20 @@
     
 
     <div class="water-animation"></div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var closeButtons = document.querySelectorAll('.flash-messages .close');
+    
+            closeButtons.forEach(function (button) {
+                button.addEventListener('click', function () {
+                    // Hide the parent flash message element when the close button is clicked
+                    var flashMessage = button.closest('.flash-messages');
+                    if (flashMessage) {
+                        flashMessage.style.display = 'none';
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>

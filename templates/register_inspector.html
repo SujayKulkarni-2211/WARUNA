@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register Water Inspector</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #2980b9, #6dd5fa);
+            background-size: 200% 100%;
+            animation: gradientBackground 10s linear infinite;
+        }
+        .navbar {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            color: #4A90E2;
+            text-decoration: none;
+            font-size: 1.5rem;
+        }
+
+        .login-box {
+            border: 1px solid #4A90E2;
+            padding: 5px 15px;
+            border-radius: 5px;
+            background: #4A90E2;
+            color: white;
+            margin-right: 5px;
+        }
+
+        .login-box a {
+            color: white;
+            text-decoration: none;
+        }
+        .boxes{
+            display: flex;
+        }
+
+        @keyframes gradientBackground {
+            0% {
+                background-position: 0 50%;
+            }
+            100% {
+                background-position: 100% 50%;
+            }
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-top: 50px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            animation: textShadowAnimation 5s ease infinite alternate;
+        }
+
+        @keyframes textShadowAnimation {
+            0% {
+                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            }
+            100% {
+                text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.5);
+            }
+        }
+
+        form {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            padding-right: 20px;
+            margin-top: 3rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        input{
+            margin-right: 20px;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            background-color: #2980b9;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #1c5d87;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-light">
+        <a class="navbar-brand" href="#">WARUNA</a>
+        <div class="boxes">
+        <div class="login-box"><a class="nav-link" href="/dashboard">Dashboard</a></div>
+        <div class="login-box"><a class="nav-link" href="/logout">Logout</a></div>
+        </div>
+    </nav>
+    <form action="/register_inspector" method="post">
+        <h1>Register Water Inspector</h1>
+        <label for="id">ID:</label>
+        <input type="text" id="id" name="id" required>
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required>
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+        <label for="mobile">Mobile Number:</label>
+        <input type="text" id="mobile" name="mobile" required>
+        <button type="submit">Register</button>
+    </form>
+</body>
+</html>

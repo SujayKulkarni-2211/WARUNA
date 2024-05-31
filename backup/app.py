@@ -33,8 +33,8 @@ def create_tables():
                  issue_id INTEGER,
                  FOREIGN KEY(inspector_id) REFERENCES employees(employee_id),
                  FOREIGN KEY(issue_id) REFERENCES reported_problems(id))''')
-    # c.execute("INSERT INTO employees VALUES ('manager1', 'password', 'Manager', 'manager1@example.com', '9380142763', 0, 0)")
-    # c.execute("INSERT INTO employees VALUES ('inspector1', 'password', 'Water Inspector', 'inspector1@example.com', '9113518404', 0, 0)")
+    # c.execute("INSERT INTO employees VALUES ('manager1','Manager 1', 'password', 'Manager', 'manager1@example.com', '9380142763', 0, 0)")
+    # c.execute("INSERT INTO employees VALUES ('inspector1','Inspector 1', 'password', 'Water Inspector', 'inspector1@example.com', '9113518404', 0, 0)")
     
     conn.commit()
     conn.close()
