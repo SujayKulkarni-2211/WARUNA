@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,82 +8,190 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <style>
+        body,
+        html {
+            height: 100%;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to bottom right, #4A90E2, #50C9C3);
+            overflow-x: hidden;
+        }
+    
         .navbar {
             margin-bottom: 20px;
+            background: rgba(255, 255, 255, 0.8);
         }
+    
+        .navbar-brand {
+            font-weight: bold;
+            color: #4A90E2;
+        }
+    
+        .login-box {
+            border: 1px solid #4A90E2;
+            padding: 5px 15px;
+            border-radius: 5px;
+            background: #4A90E2;
+            color: white;
+        }
+    
+        .login-box a {
+            color: white;
+            text-decoration: none;
+        }
+    
         .jumbotron {
             padding: 2rem 1rem;
             text-align: center;
+            margin-bottom: 30px;
+            border-radius: 0;
+            position: relative;
+            overflow: hidden;
         }
-        .login-box {
-            border: 1px solid #ccc;
-            padding: 10px;
-            border-radius: 5px;
+    
+        .jumbotron h1 {
+            margin: 0;
+            background-image: linear-gradient(90deg, #4A90E2, #50C9C3);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: gradientAnimation 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
         }
+    
+        .jumbotron h2 {
+            color: #0e0066;
+            margin-top: 10px;
+        }
+    
+        .jumbotron h6 {
+            color: #4A90E2;
+            margin-top: 10px;
+            font-size: 1.5rem;
+        }
+    
+        @keyframes gradientAnimation {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+    
         .container {
-            margin-top: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
+    
         #map {
             height: 400px;
             width: 100%;
+            margin-bottom: 20px;
+            border-radius: 10px;
         }
-
-    .flash-messages {
-    background-color: #28a745; 
-    color: #fff; 
-    padding: 10px; 
-    margin-bottom: 20px; 
-    border-radius: 5px; 
+    
+        .flash-messages {
+            background-color: #28a745;
+            color: #fff;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+    
+        .flash-messages ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+    
+        .flash-messages .close {
+            color: #fff;
+            float: right;
+            font-size: 20px;
+            cursor: pointer;
+        }
+    
+        .flash-messages .close:hover {
+            color: #000;
+        }
+        .lead {
+    font-style: italic;
+    animation: slideFromLeft 1s ease-out forwards;
+    opacity: 0;
+    transform: translateX(-100%);
 }
 
-.flash-messages ul {
-    list-style-type: none; 
-    margin: 0; 
-    padding: 0; 
+@keyframes slideFromLeft {
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
 }
-.flash-messages .close {
-    color: #fff; 
-    float: right; 
-    font-size: 20px; 
-    cursor: pointer; 
-}
-
-.flash-messages .close:hover {
-    color: #000; 
-}
+        
+    
+        footer {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            text-align: center;
+            margin-top: 20px;
+            border-top: 1px solid #eaeaea;
+        }
+    
+        footer a {
+            color: #4A90E2;
+            text-decoration: none;
+        }
+    
+        footer a:hover {
+            text-decoration: underline;
+        }
     </style>
+    
 </head>
+
 <body>
-    <nav class="navbar navbar-light bg-light">
+    
+
+    <nav class="navbar navbar-light">
         <a class="navbar-brand" href="#">WARUNA</a>
-        <div class="login-box">Login</div>
+        <div class="login-box"><a class="nav-link" href="/login">Login</a></div>
     </nav>
+
     <!-- Flash messages -->
-{% with messages = get_flashed_messages() %}
-{% if messages %}
-<div id="flash-messages" class="flash-messages">
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <div id="flash-messages" class="flash-messages">
         <ul>
             {% for message in messages %}
-                <li>
-                    <span class="close">&times;</span>
-                    {{ message }}
-                </li>
+            <li>
+                <span class="close">&times;</span>
+                {{ message }}
+            </li>
             {% endfor %}
         </ul>
     </div>
-{% endif %}
-{% endwith %}
+    {% endif %}
+    {% endwith %}
 
     <div class="jumbotron">
         <h1 class="display-4">Welcome to WARUNA</h1>
+        <h2>Water Assessment and Reporting in Unified Network Application</h2>
+        <h6>Powered by Ministry of Jal Shakti <br> Initiative under Jal Jeevan Mission</h3>
         <p class="lead">Report water-related issues and help us improve water supply networks.</p>
     </div>
+
     <div class="container">
         <h2>Report an Issue</h2>
         <form action="/submit_issue" method="POST" enctype="multipart/form-data">
             <div class="form-group">
                 <label for="location">Location (Enter nearest landmark, then choose on the map):</label>
-                <input type="text" class="form-control" id="location" name="location" placeholder="Enter nearest landmark here" required>
+                <input type="text" class="form-control" id="location" name="location"
+                    placeholder="Enter nearest landmark here" required>
             </div>
             <div id="map"></div>
             <div id="selected-location" class="mt-3"></div>
@@ -100,7 +209,8 @@
             </div>
             <div class="form-group">
                 <label for="issue_description">Issue Description:</label>
-                <textarea class="form-control" id="issue_description" name="issue_description" rows="3" required></textarea>
+                <textarea class="form-control" id="issue_description" name="issue_description" rows="3"
+                    required></textarea>
             </div>
             <div class="form-group">
                 <label for="email">Email:</label>
@@ -113,6 +223,7 @@
             <button type="submit" class="btn btn-primary">Submit</button>
         </form>
     </div>
+
     <div class="container mt-5">
         <h2>Top 5 Reported Problems</h2>
         <ul>
@@ -123,13 +234,19 @@
                 <strong>Landmark:</strong> {{ problem[2] }}<br>
                 <strong>Date Noticed:</strong> {{ problem[7] }}
                 {% if problem[4] %}
-                <br><strong>Image:</strong> <img src="{{ url_for('static', filename='images/' ~ problem[4]) }}" alt="Issue Image" style="max-width: 200px;">
+                <br><strong>Image:</strong> <img src="{{ url_for('static', filename='images/' ~ problem[4]) }}"
+                    alt="Issue Image" style="max-width: 200px;">
                 {% endif %}
             </li>
             {% endfor %}
         </ul>
     </div>
-    
+
+    <footer>
+        <p>Developed by group sriaranea.<a href="mailto:support@sriaranea.com">Mail us</a> | <a
+                href="/feedback">Feedback</a></p>
+    </footer>
+
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
@@ -147,7 +264,7 @@
         document.getElementById('location').value = defaultLat + ', ' + defaultLng;
         document.getElementById('selected-location').innerHTML = 'Selected Location: ' + defaultLat + ', ' + defaultLng;
 
-        map.on('click', function(e) {
+        map.on('click', function (e) {
             if (marker) {
                 map.removeLayer(marker);
             }
@@ -157,20 +274,23 @@
         });
     </script>
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
+            var closeButtons = document.querySelectorAll('.flash-messages .close');
     
-    var closeButtons = document.querySelectorAll('.flash-messages .close');
-
-    
-    closeButtons.forEach(function(button) {
-        button.addEventListener('click', function() {
-            
-            document.getElementById('flash-messages').style.display = 'none';
+            closeButtons.forEach(function (button) {
+                button.addEventListener('click', function () {
+                    // Hide the parent flash message element when the close button is clicked
+                    var flashMessage = button.closest('.flash-messages');
+                    if (flashMessage) {
+                        flashMessage.style.display = 'none';
+                    }
+                });
+            });
         });
-    });
-});
-
-
     </script>
+    
+    
+    
 </body>
+
 </html>
