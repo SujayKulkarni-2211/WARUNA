@@ -472,6 +472,39 @@ def delete_employee():
             return redirect(url_for('delete_employee'))
 
     return render_template('delete_employee.html')
+@app.route('/edit_employee_page')
+def edit_employee_page():
+    return render_template('edit_employee.html')
+
+# Function to handle editing employee data
+@app.route('/edit_employee', methods=['POST'])
+def edit_employee():
+    employee_id = request.form.get('employee_id')
+    name = request.form.get('name')
+    password = request.form.get('password')
+    email = request.form.get('email')
+    mobile_number = request.form.get('mobile_number')
+
+    conn = sqlite3.connect('waruna.db')
+    c = conn.cursor()
+
+    # Check if the employee exists
+    c.execute("SELECT * FROM employees WHERE employee_id = ?", (employee_id,))
+    existing_employee = c.fetchone()
+
+    if existing_employee:
+        # Update the employee data
+        c.execute("UPDATE employees SET name = ?, password = ?, email = ?, mobile_no = ? WHERE employee_id = ?",
+                  (name, password, email, mobile_number, employee_id))
+        conn.commit()
+        conn.close()
+        flash('Employee data updated successfully', 'success')
+        return redirect(url_for('edit_employee_page'))
+    else:
+        conn.close()
+        flash('Employee does not exist', 'error')
+        return redirect(url_for('edit_employee_page'))
+
 
 if __name__ == "__main__":
     app.run(port=5001, debug=True)  
