@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inspector Dashboard</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to bottom right, #4A90E2, #50C9C3);
+            height: 100%;
+            color: #fff;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            color: #4A90E2;
+            text-decoration: none;
+            font-size: 1.5rem;
+        }
+
+        .login-box {
+            border: 1px solid #4A90E2;
+            padding: 5px 15px;
+            border-radius: 5px;
+            background: #4A90E2;
+            color: white;
+        }
+
+        .login-box a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .container {
+            width: 80%;
+            margin: 100px auto 0;
+            text-align: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: #0e0066;
+            /* background-image: linear-gradient(90deg, #4A90E2, #50C9C3); */
+            -webkit-background-clip: text;
+            background-clip: text;
+            animation: gradientAnimation 3s ease-in-out infinite;
+        }
+
+        p {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+        }
+
+        .button-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 50px; /* Added margin bottom */
+        }
+
+        button {
+            background-color: #0e0066;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 15px 30px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+            animation: floatAnimation 3s ease-in-out infinite; /* Increased animation duration */
+        }
+
+        button:hover {
+            background-color: #50C9C3;
+            transform: scale(1.05);
+            animation: none; /* Stop animation on hover */
+        }
+
+        @keyframes floatAnimation {
+            0% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-5px); /* Reduced upward movement */
+            }
+            100% {
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes gradientAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #fff;
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #0e0066;
+        }
+
+        td {
+            background-color: #4A90E2;
+        }
+
+        .task-buttons button {
+            margin-right: 10px;
+            background-color: #50C9C3;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-light">
+        <a class="navbar-brand" href="#">WARUNA</a>
+        <div class="boxes">
+            <div class="login-box"><a class="nav-link" href="/view_profile">View Profile</a></div>
+            <div class="login-box"><a class="nav-link" href="/logout">Logout</a></div>
+            </div>
+    </nav>
+
+    <div class="container">
+        <h1>Alright! Water Inspector {{ name }}, All set to solve the water problems of the nation?</h1>
+        <p>Your tasks are:</p>
+
+        <!-- Tasks table -->
+        <table>
+            <thead>
+                <tr>
+                    <th>Name of the problem</th>
+                    <th>Location</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for task in tasks %}
+                <tr>
+                    <td>{{ task.name }}</td>
+                    <td>{{ task.location }}</td>
+                    <td class="task-buttons">
+                        <button onclick="location.href='/view_image/{{ task.id }}'" type="button">View image</button>
+                        <button onclick="location.href='/view_problem_description/{{ task.id }}'" type="button">View problem description</button>
+                        <button onclick="location.href='/view_location_description/{{ task.id }}'" type="button">View location description</button>
+                        <button onclick="location.href='/inspect/{{ task.id }}'" type="button">Inspect</button>
+                        <button onclick="location.href='/file_report/{{ task.id }}'" type="button">File report</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

@@ -1,3 +1,5 @@
+#SIH1423
+
 import sqlite3
 from flask import Flask, render_template, request, flash, redirect, url_for, session
 import smtplib
@@ -12,7 +14,7 @@ app.config['UPLOAD_FOLDER'] = 'static/images'
 app.secret_key = 'bramharoopasaraswati108'
 
 # Function to create SQLite database and tables
-# Function to create SQLite database and tables with dummy employee data
+# Function to create SQLite database and tables
 def create_tables():
     conn = sqlite3.connect('waruna.db')
     c = conn.cursor()
@@ -20,17 +22,20 @@ def create_tables():
                  (id INTEGER PRIMARY KEY AUTOINCREMENT, location TEXT, landmark TEXT, 
                  location_description TEXT, issue_image TEXT, issue_description TEXT, 
                  email TEXT, date TEXT, lat REAL, lng REAL, assigned_to TEXT, status TEXT)''')  # Add lat and lng columns
-
-    # Create employees table with dummy data
     c.execute('''CREATE TABLE IF NOT EXISTS employees
-                 (employee_id TEXT PRIMARY KEY, password TEXT, role TEXT,
+                 (employee_id TEXT PRIMARY KEY, name TEXT, password TEXT, role TEXT,
                  email TEXT, mobile_no TEXT, tasks_reviewed INTEGER DEFAULT 0,
-                 tasks_completed INTEGER DEFAULT 0)''')  # Add employee table
+                 tasks_completed INTEGER DEFAULT 0)''')  # Add name column
 
-    # Insert dummy employee data
-    c.execute("INSERT INTO employees VALUES ('manager1', 'password', 'Manager', 'manager1@example.com', '1234567890', 0, 0)")
-    c.execute("INSERT INTO employees VALUES ('inspector1', 'password', 'Water Inspector', 'inspector1@example.com', '9876543210', 0, 0)")
-                 
+    # Create a table for assigned tasks
+    c.execute('''CREATE TABLE IF NOT EXISTS assigned_tasks
+                 (id INTEGER PRIMARY KEY AUTOINCREMENT, inspector_id TEXT,
+                 issue_id INTEGER,
+                 FOREIGN KEY(inspector_id) REFERENCES employees(employee_id),
+                 FOREIGN KEY(issue_id) REFERENCES reported_problems(id))''')
+    # c.execute("INSERT INTO employees VALUES ('manager1', 'password', 'Manager', 'manager1@example.com', '9380142763', 0, 0)")
+    # c.execute("INSERT INTO employees VALUES ('inspector1', 'password', 'Water Inspector', 'inspector1@example.com', '9113518404', 0, 0)")
+    
     conn.commit()
     conn.close()
 
@@ -75,25 +80,57 @@ def send_confirmation_email(email):
     except Exception as e:
         print("Error sending email:", e)
 
-# Function to handle login
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        employee_id = request.form['employee_id']
-        password = request.form['password']
+        employee_id = request.form.get('employee_id')
+        password = request.form.get('password')
+        
+        if not employee_id or not password:
+            flash('Please enter both employee ID and password', 'error')
+            return redirect(url_for('login'))
+
         conn = sqlite3.connect('waruna.db')
         c = conn.cursor()
-        c.execute("SELECT * FROM employees WHERE employee_id = ? AND password = ?", (employee_id, password))
+        c.execute("SELECT * FROM employees WHERE employee_id = ?", (employee_id,))
         user = c.fetchone()
         conn.close()
+
         if user:
-            session['employee_id'] = employee_id
-            session['role'] = user[2]  # Store role in session
-            flash('Login successful!', 'success')
-            return redirect(url_for('dashboard'))
+            stored_password = user[2]  # Assuming password is in the third column (index 2)
+            if password == stored_password:
+                session['employee_id'] = employee_id
+                session['role'] = user[3]  # Store role in session (index 3 is role)
+                session['name'] = user[1]  # Store name in session (index 1 is name)
+                flash('Login successful!', 'success')
+                return redirect(url_for('dashboard'))
+            else:
+                flash('Invalid password', 'error')
+                return redirect(url_for('login'))
         else:
-            flash('Invalid username or password', 'error')
+            flash('Invalid employee ID', 'error')
+            return redirect(url_for('login'))
+
+        
+
     return render_template('login.html')
+
+
+@app.route('/dashboard')
+def dashboard():
+    if 'employee_id' in session:
+        name = session.get('name')
+        if session['role'] == 'Manager':
+            return render_template('manager_dashboard.html', name=name)
+        elif session['role'] == 'Water Inspector':
+            return render_template('inspector_dashboard.html', name=name)
+    flash('Please log in to access this page', 'error')
+    return redirect(url_for('login'))
+
+
+
+    
+
 
 # Function to handle logout
 @app.route('/logout')
@@ -103,15 +140,7 @@ def logout():
     return redirect(url_for('login'))
 
 # Function to render dashboard based on role
-@app.route('/dashboard')
-def dashboard():
-    if 'employee_id' in session:
-        if session['role'] == 'Manager':
-            return render_template('manager_dashboard.html')
-        elif session['role'] == 'Water Inspector':
-            return render_template('inspector_dashboard.html')
-    flash('Please log in to access this page', 'error')
-    return redirect(url_for('login'))
+
 
 # Function to submit a reported issue
 @app.route('/submit_issue', methods=['POST'])
@@ -152,8 +181,8 @@ def submit_issue():
         flash('Thank you for reporting!', 'success')
 
         # Redirect to the dashboard after 30 seconds
-        time.sleep(30)
-        return redirect(url_for('dashboard'))
+        # time.sleep(30)
+        return redirect(url_for('index'))
 
 import csv
 import random
@@ -192,37 +221,196 @@ def read_iot_data(filename):
 def add_to_reported_problems(issue_type, issue_description, latitude, longitude):
     conn = sqlite3.connect('waruna.db')
     c = conn.cursor()
+    loc=f"{latitude},{longitude}"
+    issue_description=f"{issue_type}:{issue_description}"
     c.execute("INSERT INTO reported_problems (location, issue_description, lat, lng) VALUES (?, ?, ?, ?)",
-              (issue_type, issue_description, latitude, longitude))
+              (loc, issue_description, latitude, longitude))
     conn.commit()
     conn.close()
 generate_dummy_iot_data('data/dummy_iot_data.csv', 100)
 read_iot_data('data/dummy_iot_data.csv')
 
-import pandas as pd
-import numpy as np
+# import pandas as pd
+# import numpy as np
 
-def generate_dummy_geospatial_data(filename, num_points):
-    # Generate dummy geospatial data
-    data = pd.DataFrame()
+# def generate_dummy_geospatial_data(filename, num_points):
+#     # Generate dummy geospatial data
+#     data = pd.DataFrame()
 
-    # Generate random coordinates (latitude and longitude)
-    data['Latitude'] = np.random.uniform(low=-90, high=90, size=num_points)
-    data['Longitude'] = np.random.uniform(low=-180, high=180, size=num_points)
+#     # Generate random coordinates (latitude and longitude)
+#     data['Latitude'] = np.random.uniform(low=-90, high=90, size=num_points)
+#     data['Longitude'] = np.random.uniform(low=-180, high=180, size=num_points)
 
-    # Generate other dummy attributes such as water source type, infrastructure type, terrain features, etc.
-    data['Water_Source'] = np.random.choice(['River', 'Lake', 'Reservoir', 'Groundwater'], size=num_points)
-    data['Infrastructure_Type'] = np.random.choice(['Pipeline', 'Channel', 'Reservoir', 'Treatment Plant'], size=num_points)
-    data['Terrain_Features'] = np.random.choice(['Flat', 'Hilly', 'Mountainous'], size=num_points)
-    data['Land_Use'] = np.random.choice(['Urban', 'Suburban', 'Rural'], size=num_points)
+#     # Generate other dummy attributes such as water source type, infrastructure type, terrain features, etc.
+#     data['Water_Source'] = np.random.choice(['River', 'Lake', 'Reservoir', 'Groundwater'], size=num_points)
+#     data['Infrastructure_Type'] = np.random.choice(['Pipeline', 'Channel', 'Reservoir', 'Treatment Plant'], size=num_points)
+#     data['Terrain_Features'] = np.random.choice(['Flat', 'Hilly', 'Mountainous'], size=num_points)
+#     data['Land_Use'] = np.random.choice(['Urban', 'Suburban', 'Rural'], size=num_points)
 
-    # Save the generated data as a CSV file
-    data.to_csv(filename, index=False)
+#     # Save the generated data as a CSV file
+#     data.to_csv(filename, index=False)
 
-# Example usage:
-generate_dummy_geospatial_data('data/dummy_geospatial_data.csv', 100)
+# # Example usage:
+# generate_dummy_geospatial_data('data/dummy_geospatial_data.csv', 100)
 
+# Function to assign tasks to water inspectors
+@app.route('/assign_tasks', methods=['GET', 'POST'])
+def assign_tasks():
+    issues_data = []
+    water_inspectors=[]
+    if request.method == 'POST':
+        # Get the selected reported issue and water inspector from the form
+        issue_id = request.form.get('issue_id')
+        inspector_id = request.form.get('inspector_id')
+
+        # Update the database to assign the task to the selected water inspector
+        conn = sqlite3.connect('waruna.db')
+        c = conn.cursor()
+        c.execute("UPDATE reported_problems SET assigned_to = ?, status = 'assigned' WHERE id = ?", (inspector_id, issue_id))
+        
+        # Insert the assigned task into the assigned_tasks table
+        c.execute("INSERT INTO assigned_tasks (inspector_id, issue_id) VALUES (?, ?)", (inspector_id, issue_id))
+        
+        conn.commit()
+        conn.close()
+
+        # Create a table for the inspector's tasks if not exists
+        table_name=f"{inspector_id}_tasks"
+        create_inspector_task_table(table_name)
+
+        # Insert the assigned task into the inspector's task table
+        insert_inspector_task(table_name, issue_id)
+        #print(reported_issues)
+        session['task_assigned'] = True
+        # Redirect to the assign tasks page after updating the database
+        return redirect(url_for('assign_tasks'))
+
+
+    else:
+        # Fetch reported issues and water inspectors from the database
+        reported_issues = get_reported_issues()
+        water_inspectors = get_water_inspectors()
+
+        # Fetch already assigned issues to exclude them from the table
+        assigned_issues = get_assigned_issues()
+
+        # Combine issues and inspectors data
+        issues_data = []
+        for issue in reported_issues:
+            if issue['id'] not in assigned_issues:
+                issues_data.append(issue)
+
+        if 'task_assigned' in session:
+            flash('Task assigned successfully!', 'success')
+            session.pop('task_assigned', None)
+            
+        return render_template('assign_tasks.html', issues=issues_data, inspectors=water_inspectors)
+
+
+def create_inspector_task_table(table_name):
+    """Create a table for the inspector's tasks if not exists."""
+    conn = sqlite3.connect('waruna.db')
+    c = conn.cursor()
+    c.execute(f"CREATE TABLE IF NOT EXISTS tasks_{table_name} (id INTEGER PRIMARY KEY AUTOINCREMENT, issue_id INTEGER)")
+    conn.commit()
+    conn.close()
+
+
+def insert_inspector_task(table_name, issue_id):
+    """Insert the assigned task into the inspector's task table."""
+    conn = sqlite3.connect('waruna.db')
+    c = conn.cursor()
+    c.execute(f"INSERT INTO tasks_{table_name} (issue_id) VALUES (?)", (issue_id,))
+    conn.commit()
+    conn.close()
+
+
+def get_assigned_issues():
+    """Get a list of already assigned issue IDs."""
+    conn = sqlite3.connect('waruna.db')
+    c = conn.cursor()
+    c.execute("SELECT issue_id FROM assigned_tasks")
+    assigned_issues = [row[0] for row in c.fetchall()]
+    conn.close()
+    return assigned_issues
+
+
+def get_reported_issues():
+    """Fetch reported issues from the database."""
+    conn = sqlite3.connect('waruna.db')
+    c = conn.cursor()
+    c.execute("SELECT * FROM reported_problems WHERE assigned_to IS NULL")
+    reported_issues = [{'id': row[0], 'location': row[1], 'landmark': row[2], 'location_description': row[3], 'issue_image': row[4],
+                        'issue_description': row[5], 'email': row[6], 'date': row[7], 'lat': row[8], 'lng': row[9]} for row in c.fetchall()]
+    conn.close()
+    return reported_issues
+
+
+def get_water_inspectors():
+    """Fetch water inspectors from the database along with the number of tasks assigned to each inspector."""
+    conn = sqlite3.connect('waruna.db')
+    c = conn.cursor()
+    c.execute("""
+        SELECT e.employee_id, e.name, COUNT(at.issue_id) AS tasks_assigned
+        FROM employees e
+        LEFT JOIN assigned_tasks at ON e.employee_id = at.inspector_id
+        WHERE e.role = 'Water Inspector'
+        GROUP BY e.employee_id, e.name
+    """)
+    water_inspectors = [{'employee_id': row[0], 'name': row[1], 'tasks_assigned': row[2]} for row in c.fetchall()]
+    conn.close()
+    return water_inspectors
+
+
+
+@app.route('/view_profile')
+def view_profile():
+    if 'employee_id' in session:
+        employee_id = session['employee_id']
+        conn = sqlite3.connect('waruna.db')
+        c = conn.cursor()
+        c.execute("SELECT employee_id, name, role, email, mobile_no FROM employees WHERE employee_id = ?", (employee_id,))
+        profile = c.fetchone()
+        conn.close()
+        return render_template('view_profile.html', profile=profile)
+    flash('Please log in to access this page', 'error')
+    return redirect(url_for('login'))
+
+@app.route('/change_password', methods=['GET', 'POST'])
+def change_password():
+    if 'employee_id' in session:
+        if request.method == 'POST':
+            current_password = request.form.get('current_password')
+            new_password = request.form.get('new_password')
+            confirm_password = request.form.get('confirm_password')
+            employee_id = session['employee_id']
+
+            if new_password != confirm_password:
+                flash('New passwords do not match', 'error')
+                return redirect(url_for('change_password'))
+
+            conn = sqlite3.connect('waruna.db')
+            c = conn.cursor()
+            c.execute("SELECT password FROM employees WHERE employee_id = ?", (employee_id,))
+            stored_password = c.fetchone()[0]
+
+            if stored_password != current_password:
+                flash('Current password is incorrect', 'error')
+                conn.close()
+                return redirect(url_for('change_password'))
+
+            c.execute("UPDATE employees SET password = ? WHERE employee_id = ?", (new_password, employee_id))
+            conn.commit()
+            conn.close()
+
+            flash('Password successfully changed', 'success')
+            return redirect(url_for('view_profile'))
+        
+        return render_template('change_password.html')
+
+    flash('Please log in to access this page', 'error')
+    return redirect(url_for('login'))
 
 
 if __name__ == "__main__":
-    app.run(port=5001, debug=True)  # Change the port number to 5001
+    app.run(port=5001, debug=True)  
