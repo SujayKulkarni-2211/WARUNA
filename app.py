@@ -75,8 +75,12 @@ def send_confirmation_email(email):
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        employee_id = request.form['employee_id']
-        password = request.form['password']
+        print(request.form)  # Print the form data to debug
+        employee_id = request.form.get('employee_id')
+        password = request.form.get('password')
+        if not employee_id or not password:
+            flash('Please enter both employee ID and password', 'error')
+            return redirect(url_for('login'))
         conn = sqlite3.connect('waruna.db')
         c = conn.cursor()
         c.execute("SELECT * FROM employees WHERE employee_id = ? AND password = ?", (employee_id, password))
@@ -90,6 +94,7 @@ def login():
         else:
             flash('Invalid username or password', 'error')
     return render_template('login.html')
+
 
 # Function to handle logout
 @app.route('/logout')
