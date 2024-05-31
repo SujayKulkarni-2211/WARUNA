@@ -153,8 +153,8 @@ def submit_issue():
         flash('Thank you for reporting!', 'success')
 
         # Redirect to the dashboard after 30 seconds
-        time.sleep(30)
-        return redirect(url_for('dashboard'))
+        # time.sleep(30)
+        return redirect(url_for('index'))
 
 import csv
 import random
