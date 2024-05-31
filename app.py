@@ -505,6 +505,24 @@ def edit_employee():
         flash('Employee does not exist', 'error')
         return redirect(url_for('edit_employee_page'))
 
+@app.route('/delete_task', methods=['GET', 'POST'])
+def delete_task():
+    if request.method == 'POST':
+        issue_id = request.form.get('issue_id')
+
+        conn = sqlite3.connect('waruna.db')
+        c = conn.cursor()
+
+        # Delete the task from the database
+        c.execute("DELETE FROM reported_problems WHERE id = ?", (issue_id,))
+        conn.commit()
+        conn.close()
+
+        flash('ISSUE deleted successfully', 'success')
+        return redirect(request.referrer or url_for('assign_tasks'))
+    else:
+        
+        return "This route only accepts POST requests. Go back and use a form to delete a task."
 
 if __name__ == "__main__":
     app.run(port=5001, debug=True)  
