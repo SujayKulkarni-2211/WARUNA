@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WARUNA</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <style>
+        .navbar {
+            margin-bottom: 20px;
+        }
+        .jumbotron {
+            padding: 2rem 1rem;
+            text-align: center;
+        }
+        .login-box {
+            border: 1px solid #ccc;
+            padding: 5px;
+            border-radius: 5px;
+        }
+        .container {
+            margin-top: 20px;
+        }
+        #map {
+            height: 400px;
+            width: 100%;
+        }
+
+    .flash-messages {
+    background-color: #28a745; 
+    color: #fff; 
+    padding: 10px; 
+    margin-bottom: 20px; 
+    border-radius: 5px; 
+}
+
+.flash-messages ul {
+    list-style-type: none; 
+    margin: 0; 
+    padding: 0; 
+}
+.flash-messages .close {
+    color: #fff; 
+    float: right; 
+    font-size: 20px; 
+    cursor: pointer; 
+}
+
+.flash-messages .close:hover {
+    color: #000; 
+}
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-light bg-light">
+        <a class="navbar-brand" href="#">WARUNA</a>
+        <div class="login-box"><a class="nav-link" href="/login">Login</a></div>
+    </nav>
+    <!-- Flash messages -->
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<div id="flash-messages" class="flash-messages">
+        <ul>
+            {% for message in messages %}
+                <li>
+                    <span class="close">&times;</span>
+                    {{ message }}
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endif %}
+{% endwith %}
+
+    <div class="jumbotron">
+        <h1 class="display-4">Welcome to WARUNA</h1>
+        <p class="lead">Report water-related issues and help us improve water supply networks.</p>
+    </div>
+    <div class="container">
+        <h2>Report an Issue</h2>
+        <form action="/submit_issue" method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="location">Location (Enter nearest landmark, then choose on the map):</label>
+                <input type="text" class="form-control" id="location" name="location" placeholder="Enter nearest landmark here" required>
+            </div>
+            <div id="map"></div>
+            <div id="selected-location" class="mt-3"></div>
+            <div class="form-group mt-3">
+                <label for="landmark">Landmark:</label>
+                <input type="text" class="form-control" id="landmark" name="landmark">
+            </div>
+            <div class="form-group">
+                <label for="location_description">Location Description:</label>
+                <input type="text" class="form-control" id="location_description" name="location_description">
+            </div>
+            <div class="form-group">
+                <label for="issue_image">Issue Image:</label>
+                <input type="file" class="form-control" id="issue_image" name="issue_image">
+            </div>
+            <div class="form-group">
+                <label for="issue_description">Issue Description:</label>
+                <textarea class="form-control" id="issue_description" name="issue_description" rows="3" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" class="form-control" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="date">Date Noticed:</label>
+                <input type="date" class="form-control" id="date" name="date" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+    <div class="container mt-5">
+        <h2>Top 5 Reported Problems</h2>
+        <ul>
+            {% for problem in top_problems %}
+            <li>
+                <strong>Description:</strong> {{ problem[5] }}<br>
+                <strong>Location:</strong> {{ problem[1] }}<br>
+                <strong>Landmark:</strong> {{ problem[2] }}<br>
+                <strong>Date Noticed:</strong> {{ problem[7] }}
+                {% if problem[4] %}
+                <br><strong>Image:</strong> <img src="{{ url_for('static', filename='images/' ~ problem[4]) }}" alt="Issue Image" style="max-width: 200px;">
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script>
+        var defaultLat = 12.922966818281044;
+        var defaultLng = 77.50153419328853;
+        var map = L.map('map').setView([defaultLat, defaultLng], 13);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 18,
+        }).addTo(map);
+
+        var marker = L.marker([defaultLat, defaultLng]).addTo(map);
+        document.getElementById('location').value = defaultLat + ', ' + defaultLng;
+        document.getElementById('selected-location').innerHTML = 'Selected Location: ' + defaultLat + ', ' + defaultLng;
+
+        map.on('click', function(e) {
+            if (marker) {
+                map.removeLayer(marker);
+            }
+            marker = L.marker(e.latlng).addTo(map);
+            document.getElementById('location').value = e.latlng.lat + ', ' + e.latlng.lng;
+            document.getElementById('selected-location').innerHTML = 'Selected Location: ' + e.latlng.lat + ', ' + e.latlng.lng;
+        });
+    </script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+    
+    var closeButtons = document.querySelectorAll('.flash-messages .close');
+
+    
+    closeButtons.forEach(function(button) {
+        button.addEventListener('click', function() {
+            
+            document.getElementById('flash-messages').style.display = 'none';
+        });
+    });
+});
+
+
+    </script>
+</body>
+</html>

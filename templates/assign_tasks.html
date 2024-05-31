@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Assign Tasks</title>
+</head>
+<body>
+    <h1>Assign Tasks to Water Inspectors</h1>
+    <form action="{{ url_for('assign_tasks') }}" method="post">
+        <label for="issue">Select Reported Issue:</label>
+        <select name="issue_id" id="issue">
+            {% for issue in issues %}
+                <option value="{{ issue[0] }}">{{ issue[1] }} - {{ issue[2] }}</option>
+            {% endfor %}
+        </select><br><br>
+
+        <label for="inspector">Select Water Inspector:</label>
+        <select name="inspector_id" id="inspector">
+            {% for inspector in inspectors %}
+                <option value="{{ inspector[0] }}">{{ inspector[1] }}</option>
+            {% endfor %}
+        </select><br><br>
+
+        <input type="submit" value="Assign Task">
+    </form>
+</body>
+</html>
