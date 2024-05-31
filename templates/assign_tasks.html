@@ -176,11 +176,14 @@
                 <td>
                     <button type="submit">Assign</button>
                 </td>
+            </form>
                 <td>
-                    <button onclick="deleteIssue('{{ issue.id }}')">Delete</button>
+                    <form action="/delete_task" method="post">
+                        <input type="hidden" name="issue_id" value="{{ issue.id }}">
+                    <button type="submit">Delete</button></form>
                 </td>
                 <!-- Add more columns as needed -->
-            </form></tr>
+            </tr>
             {% endfor %}
         </tbody>
     </table>
