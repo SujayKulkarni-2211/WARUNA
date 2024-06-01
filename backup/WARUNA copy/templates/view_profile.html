@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Profile</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            color: #4A90E2;
+            text-decoration: none;
+            font-size: 1.5rem;
+        }
+
+        .login-box {
+            border: 1px solid #4A90E2;
+            padding: 5px 15px;
+            border-radius: 5px;
+            background: #4A90E2;
+            color: white;
+            margin-right: 5px;
+        }
+
+        .login-box a {
+            color: white;
+            text-decoration: none;
+        }
+        /* Container Styling */
+        .container {
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #F0F8FF; /* Light Blue */
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+        }
+
+        /* Table Styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd; /* Light Gray */
+            text-align: left;
+        }
+
+        th {
+            background-color: #4A90E2; /* Blue */
+            color: white;
+        }
+
+        /* Buttons Styling */
+        button {
+            display: block;
+            margin: 0 auto;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #4A90E2; /* Blue */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #357EBD; /* Dark Blue */
+        }
+        .boxes{
+            display: flex;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-light">
+        <a class="navbar-brand" href="#">WARUNA</a>
+        <div class="boxes">
+        <div class="login-box"><a class="nav-link" href="/dashboard">Dashboard</a></div>
+        <div class="login-box"><a class="nav-link" href="/logout">Logout</a></div>
+        </div>
+    </nav>
+
+    <!-- Profile Information Container -->
+    <div class="container">
+        <h1>Profile Information</h1>
+        <table>
+            <tr>
+                <th>Attribute</th>
+                <th>Value</th>
+            </tr>
+            <tr>
+                <td>Employee ID</td>
+                <td>{{ profile[0] }}</td>
+            </tr>
+            <tr>
+                <td>Name</td>
+                <td>{{ profile[1] }}</td>
+            </tr>
+            <tr>
+                <td>Role</td>
+                <td>{{ profile[2] }}</td>
+            </tr>
+            <tr>
+                <td>Email</td>
+                <td>{{ profile[3] }}</td>
+            </tr>
+            <tr>
+                <td>Mobile Number</td>
+                <td>{{ profile[4] }}</td>
+            </tr>
+        </table>
+
+        <!-- Buttons -->
+        <button onclick="location.href='/change_password'" type="button">Change Password</button>
+        <button onclick="location.href='/dashboard'" type="button">Back to Dashboard</button>
+        
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage IoT Data</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f8ff; /* Light blue background */
+            color: #333;
+            line-height: 1.6;
+        }
+        h1 {
+            font-size: 36px;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #007bff; /* Blue title */
+        }
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            padding: 20px;
+            background-color: #fff; /* White background for container */
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Shadow effect */
+        }
+        .image-container {
+            position: relative;
+            width: 400px; /* Fixed width for image container */
+            height: 300px; /* Fixed height for image container */
+            overflow: hidden;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); /* Shadow effect */
+            transition: box-shadow 0.3s ease;
+        }
+        .image-container:hover {
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3); /* Hover effect */
+        }
+        .image-container img, .map-iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        .image-container:hover img, .map-iframe:hover {
+            transform: scale(1.05); /* Hover effect */
+        }
+        .map-iframe {
+            border: none;
+        }
+        .download-pdf {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .download-pdf a {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+            margin-right: 10px;
+            margin-bottom: 20px;
+        }
+        .download-pdf a:hover {
+            background-color: #0056b3;
+        }
+        .navbar {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            color: #4A90E2;
+            text-decoration: none;
+            font-size: 1.5rem;
+        }
+
+        .login-box {
+            border: 1px solid #4A90E2;
+            padding: 5px 15px;
+            border-radius: 5px;
+            background: #4A90E2;
+            color: white;
+            margin-right: 5px;
+        }
+
+        .login-box a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .boxes {
+            display: flex;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-light">
+        <a class="navbar-brand" href="#">WARUNA</a>
+        <div class="boxes">
+        <div class="login-box"><a class="nav-link" href="/dashboard">Dashboard</a></div>
+        <div class="login-box"><a class="nav-link" href="/logout">Logout</a></div>
+        </div>
+    </nav>
+    <h1>Espy IoT Data</h1>
+    <div class="boxes" style="justify-content: center;">
+    <div class="download-pdf">
+        <a href="/downloadiotdata" target="_blank">Download IoT Data</a>
+    </div>
+    <div class="download-pdf">
+        <a href="/download_pdf" target="_blank">Download PDF</a>
+    </div>
+</div>
+    
+    <div class="container">
+        <!-- Map Graph -->
+        <div class="iframe-container">
+            <iframe src="/map_graph" frameborder="0"></iframe>
+        </div>
+
+        <!-- Heatmap -->
+        <div class="image-container">
+            <a href="{{ heatmap_path }}"><img src="{{ heatmap_path }}" alt="Heatmap"></a>
+        </div>
+
+        <!-- Seaborn Graphs -->
+        <div class="image-container">
+            <a href="{{ scatter_plot_path }}"><img src="{{ scatter_plot_path }}" alt="Scatter Plot"></a>
+        </div>
+        <div class="image-container">
+            <a href="{{ histogram_path }}"><img src="{{ histogram_path }}" alt="Histogram"></a>
+        </div>
+        <div class="image-container">
+            <a href="{{ box_plot_path }}"><img src="{{ box_plot_path }}" alt="Box Plot"></a>
+        </div>
+        <div class="image-container">
+            <a href="{{ pairplot_path }}"><img src="{{ pairplot_path }}" alt="Pairplot"></a>
+        </div>
+        <div class="image-container">
+            <a href="{{ seaborn_graph2_path }}"><img src="{{ seaborn_graph2_path }}" alt="Seaborn Graph 2"></a>
+        </div>
+        <div class="image-container">
+            <a href="{{ seaborn_graph3_path }}"><img src="{{ seaborn_graph3_path }}" alt="Seaborn Graph 3"></a>
+        </div>
+        <div class="image-container">
+            <a href="{{ seaborn_graph4_path }}"><img src="{{ seaborn_graph4_path }}" alt="Seaborn Graph 4"></a>
+        </div>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- Map Graph -->
+
+
+     <script>
+        $(document).ready(function() {
+            $("#mapGraph").load("/map_graph");
+        });
+    </script>
+
+    
+    
+</body>
+</html>
