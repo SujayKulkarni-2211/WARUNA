@@ -3,19 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inspector Dashboard</title>
+    <title>Water Inspector Dashboard</title>
     <style>
-        body, html {
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #2980b9; /* Blue */
             margin: 0;
             padding: 0;
-            font-family: Arial, sans-serif;
-            background: linear-gradient(to bottom right, #4A90E2, #50C9C3);
-            height: 100%;
-            color: #fff;
-            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
             position: relative;
         }
-
         .navbar {
             background: rgba(255, 255, 255, 0.8);
             padding: 10px 20px;
@@ -23,6 +24,10 @@
             justify-content: space-between;
             align-items: center;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: relative;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
         }
 
         .navbar-brand {
@@ -30,6 +35,7 @@
             color: #4A90E2;
             text-decoration: none;
             font-size: 1.5rem;
+            margin-left: 15px;
         }
 
         .login-box {
@@ -38,6 +44,7 @@
             border-radius: 5px;
             background: #4A90E2;
             color: white;
+            margin-right: 5px;
         }
 
         .login-box a {
@@ -45,140 +52,244 @@
             text-decoration: none;
         }
 
-        .container {
-            width: 80%;
-            margin: 100px auto 0;
-            text-align: center;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 20px;
-            color: #0e0066;
-            /* background-image: linear-gradient(90deg, #4A90E2, #50C9C3); */
-            -webkit-background-clip: text;
-            background-clip: text;
-            animation: gradientAnimation 3s ease-in-out infinite;
-        }
-
-        p {
-            font-size: 1.5rem;
-            margin-bottom: 30px;
-        }
-
-        .button-container {
+        .boxes {
             display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 15px;
-            margin-bottom: 50px; /* Added margin bottom */
+            margin-right: 20px;
         }
 
-        button {
-            background-color: #0e0066;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            padding: 15px 30px;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: background-color 0.3s, transform 0.3s;
-            animation: floatAnimation 3s ease-in-out infinite; /* Increased animation duration */
+
+        .background-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
         }
 
-        button:hover {
-            background-color: #50C9C3;
-            transform: scale(1.05);
-            animation: none; /* Stop animation on hover */
+        .wave {
+            position: absolute;
+            opacity: .4;
+            width: 1500px;
+            height: 1300px;
+            margin-left: -150px;
+            margin-top: -250px;
+            border-radius: 43%;
+            background: radial-gradient(circle, #ffffff 20%, transparent 80%);
+            animation: rotate 10000ms infinite linear;
         }
 
-        @keyframes floatAnimation {
-            0% {
-                transform: translateY(0);
-            }
-            50% {
-                transform: translateY(-5px); /* Reduced upward movement */
-            }
-            100% {
-                transform: translateY(0);
-            }
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
-        @keyframes gradientAnimation {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        .wave.-one {
+            animation-duration: 10000ms;
+            opacity: 5%;
+        }
+
+        .wave.-two {
+            animation-duration: 6000ms;
+            opacity: 10%;
+        }
+
+        .title {
+            font-size: 32px;
+            color: #fff;
+            text-align: center;
+            margin-top: 50px;
+            animation: floatUp 1s ease-out;
+        }
+
+        .container {
+            max-width: 800px;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: rgba(255, 255, 255, 0.9); /* Light Blue */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            animation: floatUp 1s ease-out;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
+            animation: fadeInTable 1s ease-out;
         }
 
         th, td {
-            border: 1px solid #fff;
-            padding: 10px;
-            text-align: center;
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+            color: #333;
         }
 
         th {
-            background-color: #0e0066;
+            background-color: #2980b9;
+            color: #fff;
         }
 
-        td {
-            background-color: #4A90E2;
-        }
-
-        .task-buttons button {
+        a {
+            text-decoration: none;
+            color: #2980b9;
             margin-right: 10px;
-            background-color: #50C9C3;
+            transition: color 0.3s ease;
+        }
+
+        a:hover {
+            color: #1c5d87;
+        }
+
+        .yta {
+            font-size: xx-large;
+            font-weight: bold;
+            text-align: center;
+            color: #2980b9;
+        }
+
+        @keyframes floatUp {
+            0% { opacity: 0; transform: translateY(-20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInTable {
+            0% { opacity: 0; transform: translateY(-20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        .flash-messages {
+            background-color: #28a745;
+            color: #fff;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            position: relative;
+        }
+
+        .flash-messages ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .flash-messages .close {
+            color: #fff;
+            float: right;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .flash-messages .close:hover {
+            color: #000;
+        }
+        .btn {
+            padding: 10px 15px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+
+        .btn-showimg {
+            background-color: #c32cf6;
+            color: rgb(32, 0, 52);
+        }
+        .btn-insloc{
+            background-color: #00eef6;
+            color: rgb(32, 0, 52);
+        }
+        .btn-filerepo{
+           
+            background-color: #00f6c9;
+            color: rgb(32, 0, 52);
+            
         }
     </style>
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-light">
+    <nav class="navbar">
         <a class="navbar-brand" href="#">WARUNA</a>
         <div class="boxes">
             <div class="login-box"><a class="nav-link" href="/view_profile">View Profile</a></div>
             <div class="login-box"><a class="nav-link" href="/logout">Logout</a></div>
-            </div>
+        </div>
     </nav>
+     <!-- Flash messages -->
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <div id="flash-messages" class="flash-messages">
+        <ul>
+            {% for message in messages %}
+            <li>
+                <span class="close" style="margin-left: 2px;">&times;</span>
+                {{ message }}
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <div class="background-animation">
+        <div class="wave -one"></div>
+        <div class="wave -two"></div>
+        <div class="wave -two"></div>
+        <div class="wave -one"></div>
+    </div> <!-- Background Animation -->
+    <h1 class="title">Alright! Water Inspector {{ name }},<br> All set to solve the water problems of the nation?</h1>
 
     <div class="container">
-        <h1>Alright! Water Inspector {{ name }}, All set to solve the water problems of the nation?</h1>
-        <p>Your tasks are:</p>
-
-        <!-- Tasks table -->
-        <table>
+        <p class="yta">Your Tasks are: </p>
+        <table border="1">
             <thead>
                 <tr>
-                    <th>Name of the problem</th>
-                    <th>Location</th>
+                    <th>Issue ID</th>
+                    <th>Problem/Issue</th>
+                    <th>Location Description</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
                 {% for task in tasks %}
                 <tr>
-                    <td>{{ task.name }}</td>
-                    <td>{{ task.location }}</td>
-                    <td class="task-buttons">
-                        <button onclick="location.href='/view_image/{{ task.id }}'" type="button">View image</button>
-                        <button onclick="location.href='/view_problem_description/{{ task.id }}'" type="button">View problem description</button>
-                        <button onclick="location.href='/view_location_description/{{ task.id }}'" type="button">View location description</button>
-                        <button onclick="location.href='/inspect/{{ task.id }}'" type="button">Inspect</button>
-                        <button onclick="location.href='/file_report/{{ task.id }}'" type="button">File report</button>
+                    <td>{{ task[0] }}</td> <!-- Issue ID -->
+                    <td>{{ task[1] }}</td> <!-- Problem/Issue -->
+                    <td>{{ task[2] }}</td> <!-- Location Description -->
+                    <td>
+                        <div class="boxes">
+                        <a href="{{ url_for('view_image', issue_id=task[0]) }}" class="btn btn-showimg">View Image</a>
+                        <a href="{{ url_for('inspect_location', lat=task[3], lng=task[4]) }}" class="btn btn-insloc">Inspect Location</a>
+                        <a href="{{ url_for('file_report', issue_id=task[0]) }}" class="btn btn-filerepo">File Report</a>
+                        </div>
                     </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
+    <div class="background-animation">
+        <div class="wave -two"></div>
+        <div class="wave -one"></div>
+        <div class="wave -one"></div>
+        <div class="wave -one"></div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var closeButtons = document.querySelectorAll('.flash-messages .close');
+    
+            closeButtons.forEach(function (button) {
+                button.addEventListener('click', function () {
+                    // Hide the parent flash message element when the close button is clicked
+                    var flashMessage = button.closest('.flash-messages');
+                    if (flashMessage) {
+                        flashMessage.style.display = 'none';
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>

@@ -123,7 +123,7 @@ def dashboard():
         if session['role'] == 'Manager':
             return render_template('manager_dashboard.html', name=name)
         elif session['role'] == 'Water Inspector':
-            return render_template('inspector_dashboard.html', name=name)
+            return redirect(url_for('inspector_dashboard'))
     flash('Please log in to access this page', 'error')
     return redirect(url_for('login'))
 
@@ -540,6 +540,42 @@ def delete_task():
     else:
         
         return "This route only accepts POST requests. Go back and use a form to delete a task."
+
+@app.route('/inspector_dashboard')
+def inspector_dashboard():
+    if 'employee_id' in session and session['role'] == 'Water Inspector':
+        name = session['name']
+        # Query the database to fetch tasks assigned to the Water Inspector
+        conn = sqlite3.connect('waruna.db')
+        c = conn.cursor()
+        c.execute("SELECT id, issue_description, location_description, lat, lng FROM reported_problems WHERE assigned_to = ?",
+                  (session['employee_id'],))
+        tasks = c.fetchall()
+        conn.close()
+        flash('Login Successful', 'success')
+        return render_template('inspector_dashboard.html', name=name, tasks=tasks)
+    else:
+        flash('Please log in as a Water Inspector to access this page', 'error')
+        return redirect(url_for('login'))
+
+
+
+@app.route('/view_image/<int:issue_id>')
+def view_image(issue_id):
+    # Logic to fetch and display the image for the given issue_id
+    pass
+
+@app.route('/inspect_location/<float:lat>/<float:lng>')
+def inspect_location(lat, lng):
+    # Logic to inspect the location based on lat and lng
+    pass
+
+@app.route('/file_report/<int:issue_id>')
+def file_report(issue_id):
+    # Logic to handle file report
+    pass
+
+
 
 if __name__ == "__main__":
     app.run(port=5001, debug=True)  
