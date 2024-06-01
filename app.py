@@ -454,56 +454,73 @@ def register_inspector():
 
     return render_template('register_inspector.html')
 
-@app.route('/delete_employee', methods=['GET', 'POST'])
-def delete_employee():
-    if request.method == 'POST':
-        employee_id = request.form.get('employee_id')
-        if employee_id:
-            conn = sqlite3.connect('waruna.db')
-            c = conn.cursor()
-            c.execute("DELETE FROM employees WHERE employee_id = ?", (employee_id,))
-            conn.commit()
-            conn.close()
-
-            flash('Employee deleted successfully', 'success')
-            return redirect(url_for('dashboard'))  # Redirect to wherever appropriate
-        else:
-            flash('Please provide an employee ID', 'error')
-            return redirect(url_for('delete_employee'))
-
-    return render_template('delete_employee.html')
-@app.route('/edit_employee_page')
-def edit_employee_page():
-    return render_template('edit_employee.html')
-
-# Function to handle editing employee data
-@app.route('/edit_employee', methods=['POST'])
-def edit_employee():
-    employee_id = request.form.get('employee_id')
-    name = request.form.get('name')
-    password = request.form.get('password')
-    email = request.form.get('email')
-    mobile_number = request.form.get('mobile_number')
-
+def get_db_connection():
     conn = sqlite3.connect('waruna.db')
+    conn.row_factory = sqlite3.Row
+    return conn
+
+@app.route('/manage_employees')
+def manage_employees():
+    conn = get_db_connection()
+    c = conn.cursor()
+    c.execute("SELECT employee_id, name, role, email, mobile_no, tasks_reviewed, tasks_completed FROM employees")
+    employees = c.fetchall()
+    conn.close()
+    return render_template('manage_employees.html', employees=employees)
+
+@app.route('/edit_employee_page/<employee_id>', methods=['GET', 'POST'])
+def edit_employee_page(employee_id):
+    conn = get_db_connection()
     c = conn.cursor()
 
-    # Check if the employee exists
-    c.execute("SELECT * FROM employees WHERE employee_id = ?", (employee_id,))
-    existing_employee = c.fetchone()
+    if request.method == 'POST':
+        name = request.form.get('name')
+        password = request.form.get('password')
+        role = request.form.get('role')
+        email = request.form.get('email')
+        mobile_number = request.form.get('mobile_number')
+        tasks_reviewed = request.form.get('tasks_reviewed')
+        tasks_completed = request.form.get('tasks_completed')
 
-    if existing_employee:
-        # Update the employee data
-        c.execute("UPDATE employees SET name = ?, password = ?, email = ?, mobile_no = ? WHERE employee_id = ?",
-                  (name, password, email, mobile_number, employee_id))
+        c.execute('''UPDATE employees 
+                     SET name = ?, password = ?, role = ?, email = ?, mobile_no = ?, 
+                         tasks_reviewed = ?, tasks_completed = ? 
+                     WHERE employee_id = ?''',
+                  (name, password, role, email, mobile_number, tasks_reviewed, tasks_completed, employee_id))
         conn.commit()
         conn.close()
         flash('Employee data updated successfully', 'success')
-        return redirect(url_for('edit_employee_page'))
+        return redirect(url_for('manage_employees'))
+
+    c.execute("SELECT * FROM employees WHERE employee_id = ?", (employee_id,))
+    employee = c.fetchone()
+    conn.close()
+
+    return render_template('edit_employee.html', employee=employee)
+
+@app.route('/delete_employee/<employee_id>', methods=['POST'])
+def delete_employee(employee_id):
+    conn = get_db_connection()
+    c = conn.cursor()
+    
+    # Check if the employee exists
+    c.execute("SELECT * FROM employees WHERE employee_id = ?", (employee_id,))
+    employee = c.fetchone()
+
+    if employee:
+        c.execute("DELETE FROM employees WHERE employee_id = ?", (employee_id,))
+        
+        # Check if a table with the employee's name exists and delete it
+        employee_table = f"tasks_{employee_id}_tasks"
+        c.execute(f"DROP TABLE IF EXISTS {employee_table}")
+
+        conn.commit()
+        flash('Employee deleted successfully', 'success')
     else:
-        conn.close()
         flash('Employee does not exist', 'error')
-        return redirect(url_for('edit_employee_page'))
+
+    conn.close()
+    return redirect(url_for('manage_employees'))
 
 @app.route('/delete_task', methods=['GET', 'POST'])
 def delete_task():
