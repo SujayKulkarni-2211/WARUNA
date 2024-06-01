@@ -260,9 +260,9 @@
                     <td>{{ task[2] }}</td> <!-- Location Description -->
                     <td>
                         <div class="boxes">
-                        <a href="{{ url_for('view_image', issue_id=task[0]) }}" class="btn btn-showimg">View Image</a>
-                        <a href="{{ url_for('inspect_location', lat=task[3], lng=task[4]) }}" class="btn btn-insloc">Inspect Location</a>
-                        <a href="{{ url_for('file_report', issue_id=task[0]) }}" class="btn btn-filerepo">File Report</a>
+                        <a href="{{ url_for('view_image', issue_id=task[0]) }}" class="btn btn-showimg" target="_blank" >View Image</a>
+                        <a href="{{ url_for('inspect_location', lat=task[3], lng=task[4]) }}" class="btn btn-insloc" target="_blank" >Inspect Location</a>
+                        <a href="{{ url_for('file_report', issue_id=task[0]) }}" class="btn btn-filerepo" target="_blank" >File Report</a>
                         </div>
                     </td>
                 </tr>

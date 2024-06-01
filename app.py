@@ -1,7 +1,7 @@
 #SIH1423
 
 import sqlite3
-from flask import Flask, render_template, request, flash, redirect, url_for, session
+from flask import Flask, render_template, request, flash, redirect, url_for, session, send_from_directory
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -562,13 +562,30 @@ def inspector_dashboard():
 
 @app.route('/view_image/<int:issue_id>')
 def view_image(issue_id):
-    # Logic to fetch and display the image for the given issue_id
-    pass
+    conn = sqlite3.connect('waruna.db')
+    c = conn.cursor()
+    c.execute("SELECT issue_image FROM reported_problems WHERE id = ?", (issue_id,))
+    result = c.fetchone()
+    conn.close()
+
+    if result and result[0]:
+        image_location = result[0]
+        # Check if the image exists in the specified location
+        if os.path.exists(image_location):
+            return send_from_directory(os.path.dirname(image_location), os.path.basename(image_location))
+        else:
+            # Image does not exist, serve a default image
+            return send_from_directory('static/images', 'noimgavailable.jpeg')
+    else:
+        # No image location found in the database, serve a default image
+        return send_from_directory('static/images', 'noimgavailable.jpeg')
 
 @app.route('/inspect_location/<float:lat>/<float:lng>')
 def inspect_location(lat, lng):
-    # Logic to inspect the location based on lat and lng
-    pass
+    # Redirect to a Google search page using the latitude and longitude
+    google_search_url = f"https://www.google.com/search?q={lat},{lng}"
+    return redirect(google_search_url)
+
 
 @app.route('/file_report/<int:issue_id>')
 def file_report(issue_id):
