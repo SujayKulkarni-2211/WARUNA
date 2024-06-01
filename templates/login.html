@@ -124,11 +124,23 @@
         .flash-messages .close:hover {
             color: #000;
         }
+        .navbar-brand {
+            font-weight: bold;
+            color: #4A90E2;
+            text-decoration: none;
+            font-size: 1.5rem;
+        }
         
     </style>
 </head>
 <body>
-<!-- Flash messages -->
+
+
+    
+    <div class="container">
+        <a class="navbar-brand" href="#">WARUNA</a>
+        <h1>Login</h1>
+        <!-- Flash messages -->
 {% with messages = get_flashed_messages() %}
 {% if messages %}
 <div id="flash-messages" class="flash-messages">
@@ -143,10 +155,6 @@
 </div>
 {% endif %}
 {% endwith %}
-
-    
-    <div class="container">
-        <h1>Login</h1>
         <form action="{{ url_for('login') }}" method="POST">
             <label for="employee_id">Employee ID:</label>
             <input type="text" id="employee_id" name="employee_id" required>
