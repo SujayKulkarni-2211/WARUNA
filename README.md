@@ -1,7 +1,8 @@
-#WARUNA
-###Water Assessment and Reporting in Unified Network Application
+# WARUNA
 
-###Project Features: 
+### Water Assessment and Reporting in Unified Network Application
+
+#### Project Features: 
 
 Issue Reporting for Public Users:
 
