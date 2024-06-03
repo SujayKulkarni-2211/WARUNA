@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Report</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #2980b9; /* Blue */
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: scroll;
+            position: relative;
+        }
+
+        .form-container {
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 90%;
+    max-width: 600px;
+    animation: fadeInUp 1s ease-out;
+    overflow-y: scroll; /* Enable vertical scrolling */
+}
+
+
+        h2 {
+            color: #2980b9;
+            text-align: center;
+            margin-bottom: 20px;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        textarea,
+        select,
+        input[type="file"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background-color: #2980b9;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #1c5d87;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h2>File Report</h2>
+        <form method="post" action="{{ url_for('file_report', issue_id=form_data.issue_id) }}" enctype="multipart/form-data">
+
+            <label for="inspector_id">Inspector's ID:</label>
+            <input type="text" id="inspector_id" name="inspector_id" value="{{ form_data.inspector_id }}" readonly>
+
+            <label for="inspector_name">Inspector's Name:</label>
+            <input type="text" id="inspector_name" name="inspector_name" value="{{ form_data.inspector_name }}" readonly>
+            
+            <label for="issue_id">Issue ID:</label>
+            <input type="text" id="issue_id" name="issue_id" value="{{ form_data.issue_id }}" readonly>
+            
+            <label for="observations">Observations:</label>
+            <textarea id="observations" name="observations" required></textarea>
+            
+            <label for="actions_taken">Actions Taken:</label>
+            <textarea id="actions_taken" name="actions_taken"></textarea>
+            
+            <label for="recommendations">Recommendations:</label>
+            <textarea id="recommendations" name="recommendations"></textarea>
+            
+            <label for="date_of_inspection">Date of Inspection:</label>
+            <input type="text" id="date_of_inspection" name="date_of_inspection" value="{{ form_data.date_of_inspection }}" readonly>
+            
+            <label for="status_update">Status Update:</label>
+            <select id="status_update" name="status_update" required>
+                <option value="inspected">Inspected</option>
+                <option value="action_taken">Action Taken</option>
+                <option value="further_action_needed">Further Action Needed</option>
+            </select>
+            
+            <label for="image">Image of Solved/Surveyed:</label>
+            <input type="file" id="image" name="image" required>
+            
+            <label for="data">Data Submission:</label>
+            <input type="file" id="data" name="data" required>
+            
+            <button type="submit">Submit Report</button>
+        </form>
+    </div>
+</body>
+</html>

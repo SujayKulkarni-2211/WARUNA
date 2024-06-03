@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assign Tasks</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Navbar Styling */
+        .navbar {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            color: #4A90E2;
+            text-decoration: none;
+            font-size: 1.5rem;
+        }
+
+        .login-box {
+            border: 1px solid #4A90E2;
+            padding: 5px 15px;
+            border-radius: 5px;
+            background: #4A90E2;
+            color: white;
+            margin-right: 5px;
+        }
+
+        .login-box a {
+            color: white;
+            text-decoration: none;
+        }
+        .boxes{
+            display: flex;
+        }
+
+        /* Table Styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #F0F8FF; /* Light Blue */
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin: 20px auto;
+            padding: 20px;
+            max-width: 800px;
+        }
+
+        th, td {
+            border: 1px solid #ddd; /* Light Gray */
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #4A90E2; /* Blue */
+            color: white;
+        }
+
+        /* Button Styling */
+        button {
+            background-color: #4A90E2; /* Blue */
+            color: white;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #357EBD; /* Dark Blue */
+        }
+
+        .flash-messages {
+            background-color: #28a745;
+            color: #fff;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+    
+        .flash-messages ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+    
+        .flash-messages .close {
+            color: #fff;
+            float: right;
+            font-size: 20px;
+            cursor: pointer;
+        }
+    
+        .flash-messages .close:hover {
+            color: #000;
+        }
+
+
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-light">
+        <a class="navbar-brand" href="#">WARUNA</a>
+        <div class="boxes">
+        <div class="login-box"><a class="nav-link" href="/dashboard">Dashboard</a></div>
+        <div class="login-box"><a class="nav-link" href="/logout">Logout</a></div>
+        </div>
+    </nav>
+
+    <!-- Assign Tasks Table -->
+    <h1 style="text-align: center;">Reported Issues</h1>
+<!-- Flash messages -->
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<div id="flash-messages" class="flash-messages">
+    <ul>
+        {% for message in messages %}
+        <li>
+            <span class="close">&times;</span>
+            {{ message }}
+        </li>
+        {% endfor %}
+    </ul>
+</div> <!-- Missing closing </div> tag -->
+{% endif %}
+{% endwith %}
+
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Issue ID</th>
+                <th>Issue Description</th>
+                <th>Location</th>
+                <th>Landmark</th>
+                <th>Location Description</th>
+                <th>Assign To</th>
+                <th>Assign</th>
+                <th>Delete</th>
+                <!-- Add more columns as needed -->
+            </tr>
+        </thead>
+        <tbody>
+            {% for issue in issues %}
+            <tr><form action="/assign_tasks" method="POST">
+                <td>{{ issue.id }}</td>
+                <td>{{ issue.issue_description }}</td>
+                <td>{{ issue.location }}</td>
+                <td>{{ issue.landmark }}</td>
+                <td>{{ issue.location_description }}</td>
+                <td>
+                    
+                        <select name="inspector_id">
+                            {% for inspector in inspectors %}
+                            <option value="{{ inspector.employee_id }}">{{ inspector.employee_id }} - {{ inspector.name }} - Tasks assigned till now: {{ inspector.tasks_assigned }}</option>
+                            {% endfor %}
+                        </select>
+                        <input type="hidden" name="issue_id" value="{{ issue.id }}">
+                        
+                    
+                </td>
+                <td>
+                    <button type="submit">Assign</button>
+                </td>
+            </form>
+                <td>
+                    <form action="/delete_task" method="post">
+                        <input type="hidden" name="issue_id" value="{{ issue.id }}">
+                    <button type="submit">Delete</button></form>
+                </td>
+                <!-- Add more columns as needed -->
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var closeButtons = document.querySelectorAll('.flash-messages .close');
+    
+            closeButtons.forEach(function (button) {
+                button.addEventListener('click', function () {
+                    // Hide the parent flash message element when the close button is clicked
+                    var flashMessage = button.closest('.flash-messages');
+                    if (flashMessage) {
+                        flashMessage.style.display = 'none';
+                    }
+                });
+            });
+        });
+    </script>
+    
+
+</body>
+</html>

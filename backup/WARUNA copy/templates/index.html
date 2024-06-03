@@ -150,65 +150,6 @@
         footer a:hover {
             text-decoration: underline;
         }
-        
-.chatbot-icon {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: 60px;
-    height: 60px;
-    background-color: #4A90E2;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    transition: background-color 0.3s;
-}
-
-.chatbot-icon:hover {
-    background-color: #357ABD;
-}
-
-.chatbot-icon img {
-    width: 30px;
-    height: 30px;
-}
-
-
-/*.chatbot-modal {
-    display: none;
-    position: fixed;
-    bottom: 80px;
-    right: 20px;
-    width: 400px;
-    height: 600px;
-    background-color: white;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    z-index: 1000;
-    overflow: hidden;
-}
-
-.chatbot-modal iframe {
-    width: 100%;
-    height: 100%;
-    border: none;
-}
-
-.chatbot-modal .close-btn {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    cursor: pointer;
-    font-size: 20px;
-    color: #333;
-} */
-
-   
-
-
     </style>
     
 </head>
@@ -300,22 +241,6 @@
             {% endfor %}
         </ul>
     </div>
-    <!-- Chatbot icon -->
-<div class="chatbot-icon" id="chatbot-icon">
-    <img src="https://img.icons8.com/ios-filled/50/ffffff/chat.png" alt="Chatbot Icon">
-</div>
-
-<!-- Chatbot modal -->
-<!-- <div class="chatbot-modal" id="chatbot-modal">
-    <div class="close-btn" id="close-btn">&times;</div>
-    <iframe src="/botwarunacharya" style="width:100%; height:500px; border:none;"></iframe>
-
-</div> -->
-
-
-
-
-
 
     <footer>
         <p>Developed by <a href="https://sriaranea.com/sriaranea/">sriaranea. <br></a> <a href="mailto:sriaranea@gmail.com">Mail us</a> | <a
@@ -326,29 +251,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-    <!-- <script>
-        document.getElementById('chatbot-icon').addEventListener('click', function () {
-            document.getElementById('chatbot-modal').style.display = 'block';
-        });
-    
-        document.getElementById('close-btn').addEventListener('click', function () {
-            document.getElementById('chatbot-modal').style.display = 'none';
-        });
-    
-        window.addEventListener('click', function (event) {
-            if (event.target == document.getElementById('chatbot-modal')) {
-                document.getElementById('chatbot-modal').style.display = 'none';
-            }
-        });
-    </script> -->
-    <script>
-        document.getElementById('chatbot-icon').addEventListener('click', function() {
-            window.open('/botwarunacharya', '_blank', 'width=400,height=600');
-        });
-    </script>
-    
-    
-    
     <script>
         var defaultLat = 12.922966818281044;
         var defaultLng = 77.50153419328853;

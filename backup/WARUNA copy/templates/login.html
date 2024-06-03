@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - WARUNA</title>
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to bottom right, #4A90E2, #50C9C3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 10;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 1rem;
+            color: #4A90E2;
+        }
+
+        label {
+            display: block;
+            margin-top: 1rem;
+            color: #333;
+        }
+
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 0.5rem;
+            margin-top: 0.5rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button[type="submit"] {
+            width: 106%;
+            padding: 0.5rem;
+            margin-top: 1rem;
+            border: none;
+            border-radius: 5px;
+            background: #4A90E2;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .gobacka{
+            width: 100%;
+            padding: 0.5rem;
+            margin: 10px;
+            margin-left: 0px;
+            border: none;
+            border-radius: 5px;
+            background: #4ae2aa;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            position: relative;
+            display: block;
+            text-decoration: none;
+            text-align: center;
+
+        }
+
+        button[type="submit"]:hover,.gobacka:hover {
+            background: #357ABD;
+        }
+
+        .water-animation {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100px;
+            background: url('https://s3-us-west-2.amazonaws.com/s.cdpn.io/85486/wave.svg') repeat-x;
+            background-size: contain;
+            animation: wave 2s infinite linear;
+            z-index: 1;
+        }
+
+        @keyframes wave {
+            0% {
+                background-position-x: 0;
+            }
+            100% {
+                background-position-x: 1000px;
+            }
+        }
+        .flash-messages {
+            background-color: #28a745;
+            color: #fff;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+    
+        .flash-messages ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+    
+        .flash-messages .close {
+            color: #fff;
+            float: right;
+            font-size: 20px;
+            cursor: pointer;
+        }
+    
+        .flash-messages .close:hover {
+            color: #000;
+        }
+        .navbar-brand {
+            font-weight: bold;
+            color: #4A90E2;
+            text-decoration: none;
+            font-size: 1.5rem;
+        }
+        
+    </style>
+</head>
+<body>
+
+
+    
+    <div class="container">
+        <a class="navbar-brand" href="#">WARUNA</a>
+        <h1>Login</h1>
+        <!-- Flash messages -->
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<div id="flash-messages" class="flash-messages">
+    <ul>
+        {% for message in messages %}
+        <li>
+            <span class="close">&times;</span>
+            {{ message }}
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+{% endwith %}
+        <form action="{{ url_for('login') }}" method="POST">
+            <label for="employee_id">Employee ID:</label>
+            <input type="text" id="employee_id" name="employee_id" required>
+            
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+            
+            <button type="submit">Login</button>
+            <a href="{{ url_for('index') }}" class="gobacka">Go Back</a>
+        </form>
+    </div><br>
+
+    
+
+    <div class="water-animation"></div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var closeButtons = document.querySelectorAll('.flash-messages .close');
+    
+            closeButtons.forEach(function (button) {
+                button.addEventListener('click', function () {
+                    // Hide the parent flash message element when the close button is clicked
+                    var flashMessage = button.closest('.flash-messages');
+                    if (flashMessage) {
+                        flashMessage.style.display = 'none';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

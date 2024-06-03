@@ -1,0 +1,10 @@
+Issue ID: 8
+Inspector ID: inspector1
+Inspector Name: Inspector 1
+Issue Description: Low Pressure:Pressure level is too low: 11.413397621264059
+Observations: done
+Actions Taken: done
+Recommendations: done
+Date of Inspection: 2024-06-03
+Status Update: inspected
+

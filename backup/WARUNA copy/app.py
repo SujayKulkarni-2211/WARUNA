@@ -182,20 +182,21 @@ def submit_issue():
         return redirect(url_for('index'))
 
 import csv
+import random
 import sqlite3
 
 # Function to generate dummy IoT data and write it to a CSV file
-# def generate_dummy_iot_data(filename, num_entries):
-#     with open(filename, mode='w', newline='') as file:
-#         writer = csv.writer(file)
-#         writer.writerow(['Timestamp', 'Flow Rate', 'Pressure Level', 'Latitude', 'Longitude'])
-#         for _ in range(num_entries):
-#             timestamp = '2024-05-31 12:00:00'  # Dummy timestamp
-#             flow_rate = random.uniform(0.5, 10)  # Random flow rate
-#             pressure_level = random.uniform(10, 50)  # Random pressure level
-#             latitude = random.uniform(12.9, 13)  # Random latitude within specified range
-#             longitude = random.uniform(77.4, 77.6)  # Random longitude within specified range
-#             writer.writerow([timestamp, flow_rate, pressure_level, latitude, longitude])
+def generate_dummy_iot_data(filename, num_entries):
+    with open(filename, mode='w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(['Timestamp', 'Flow Rate', 'Pressure Level', 'Latitude', 'Longitude'])
+        for _ in range(num_entries):
+            timestamp = '2024-05-31 12:00:00'  # Dummy timestamp
+            flow_rate = random.uniform(0.5, 10)  # Random flow rate
+            pressure_level = random.uniform(10, 50)  # Random pressure level
+            latitude = random.uniform(12.9, 13)  # Random latitude within specified range
+            longitude = random.uniform(77.4, 77.6)  # Random longitude within specified range
+            writer.writerow([timestamp, flow_rate, pressure_level, latitude, longitude])
 
 # Function to read IoT data from a CSV file and detect problems based on specified conditions
 def read_iot_data(filename):
@@ -223,7 +224,7 @@ def add_to_reported_problems(issue_type, issue_description, latitude, longitude)
               (loc, issue_description, latitude, longitude))
     conn.commit()
     conn.close()
-# generate_dummy_iot_data('data/dummy_iot_data.csv', 100)
+generate_dummy_iot_data('data/dummy_iot_data.csv', 100)
 read_iot_data('data/dummy_iot_data.csv')
 
 # import pandas as pd
@@ -272,10 +273,10 @@ def assign_tasks():
 
         # Create a table for the inspector's tasks if not exists
         table_name=f"{inspector_id}_tasks"
-        # create_inspector_task_table(table_name)
+        create_inspector_task_table(table_name)
 
         # Insert the assigned task into the inspector's task table
-        # insert_inspector_task(table_name, issue_id)
+        insert_inspector_task(table_name, issue_id)
         #print(reported_issues)
         session['task_assigned'] = True
         # Redirect to the assign tasks page after updating the database
@@ -583,32 +584,18 @@ def inspect_location(lat, lng):
     return redirect(google_search_url)
 
 
-from datetime import datetime
-import os
-from flask import flash, redirect, render_template, request, session, url_for
 from werkzeug.utils import secure_filename
-import sqlite3
-
-# Helper function to get current date
-def get_current_date():
-    return datetime.now().strftime('%Y-%m-%d')
-
-# Function to get issue description from the database
-def get_issue_description(issue_id):
-    conn = sqlite3.connect('waruna.db')
-    cursor = conn.cursor()
-    cursor.execute("SELECT issue_description FROM reported_problems WHERE id=?", (issue_id,))
-    result = cursor.fetchone()
-    conn.close()
-    return result[0] if result else "No description available"
+import os
 
 @app.route('/file_report/<int:issue_id>', methods=['GET', 'POST'])
 def file_report(issue_id):
+    # Logic to handle file report
+
     # Fetch inspector_id and inspector_name
     inspector_id = session.get('employee_id')
     inspector_name = session.get('name')
-    issue_description = get_issue_description(issue_id)
 
+    # Fetch form data
     if request.method == 'POST':
         observations = request.form.get('observations')
         actions_taken = request.form.get('actions_taken')
@@ -616,11 +603,12 @@ def file_report(issue_id):
         date_of_inspection = request.form.get('date_of_inspection')
         status_update = request.form.get('status_update')
         
+        # Save uploaded files
         image = request.files.get('image')
         data = request.files.get('data')
 
         # Create folder if not exists
-        folder_path = os.path.join('reports', f"{issue_id}")
+        folder_path = os.path.join('reports', f"{issue_id}_reports_folder")
         os.makedirs(folder_path, exist_ok=True)
 
         # Write form data to a text file
@@ -630,7 +618,6 @@ def file_report(issue_id):
             report_file.write(f"Issue ID: {issue_id}\n")
             report_file.write(f"Inspector ID: {inspector_id}\n")
             report_file.write(f"Inspector Name: {inspector_name}\n")
-            report_file.write(f"Issue Description: {issue_description}\n")
             report_file.write(f"Observations: {observations}\n")
             report_file.write(f"Actions Taken: {actions_taken}\n")
             report_file.write(f"Recommendations: {recommendations}\n")
@@ -646,24 +633,6 @@ def file_report(issue_id):
             data_filename = secure_filename(data.filename)
             data.save(os.path.join(folder_path, data_filename))
 
-        # Save report details to database
-        conn = sqlite3.connect('waruna.db')
-        cursor = conn.cursor()
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS inspector_reports (
-                issue_id INTEGER,
-                issue_description TEXT,
-                inspector_id INTEGER,
-                report_path TEXT,
-                image_path TEXT,
-                data_path TEXT
-            )
-        """)
-        cursor.execute("INSERT INTO inspector_reports (issue_id,issue_description, inspector_id, report_path, image_path, data_path) VALUES (?, ?, ?, ?, ?, ?)", 
-                       (issue_id,issue_description, inspector_id, report_path, os.path.join(folder_path, image_filename), os.path.join(folder_path, data_filename)))
-        conn.commit()
-        conn.close()
-
         flash('Report submitted successfully!', 'success')
         return redirect(url_for('dashboard'))
 
@@ -673,11 +642,15 @@ def file_report(issue_id):
             'inspector_id': inspector_id,
             'inspector_name': inspector_name,
             'issue_id': issue_id,
-            'issue_description': issue_description,
             'date_of_inspection': get_current_date()
         }
         return render_template('file_report.html', form_data=form_data)
 
+from datetime import datetime
+
+def get_current_date():
+
+    return datetime.now().strftime('%Y-%m-%d')
 
 @app.route('/manage_iot_data')
 def manage_iot_data():
@@ -810,9 +783,6 @@ def create_gs_pdf(image_paths, output_path):
     
     pdf.output(output_path)
 
-@app.route('/botwarunacharya')
-def botwarunacharya():
-    return redirect('https://mediafiles.botpress.cloud/c006a2d3-274b-4e5b-8567-37eb08511cce/webchat/bot.html')
 
 if __name__ == "__main__":
     app.run(debug=True)

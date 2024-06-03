@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Employee Data</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            color: #4A90E2;
+            text-decoration: none;
+            font-size: 1.5rem;
+        }
+
+        .login-box {
+            border: 1px solid #4A90E2;
+            padding: 5px 15px;
+            border-radius: 5px;
+            background: #4A90E2;
+            color: white;
+            margin-right: 5px;
+        }
+
+        .login-box a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .boxes {
+            display: flex;
+        }
+
+        .container {
+            margin: 50px auto;
+            width: 90%;
+            max-width: 1200px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #4A90E2;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #ddd;
+        }
+
+        .btn {
+            padding: 10px 15px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+
+        .btn-edit {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .btn-delete {
+            background-color: #f44336;
+            color: white;
+        }
+
+        .flash-messages {
+            background-color: #28a745;
+            color: #fff;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+
+        .flash-messages ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .flash-messages .close {
+            color: #fff;
+            float: right;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .flash-messages .close:hover {
+            color: #000;
+        }
+        
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a class="navbar-brand" href="#">WARUNA</a>
+        <div class="boxes">
+            <div class="login-box"><a class="nav-link" href="/dashboard">Dashboard</a></div>
+            <div class="login-box"><a class="nav-link" href="/logout">Logout</a></div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>Manage Employee Data</h1>
+
+        <!-- Flash messages -->
+     {% with messages = get_flashed_messages() %}
+     {% if messages %}
+     <div id="flash-messages" class="flash-messages">
+         <ul>
+             {% for message in messages %}
+             <li>
+                 <span class="close">&times;</span>
+                 {{ message }}
+             </li>
+             {% endfor %}
+         </ul>
+     </div>
+     {% endif %}
+     {% endwith %}
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Employee ID</th>
+                    <th>Name</th>
+                    <th>Role</th>
+                    <th>Email</th>
+                    <th>Mobile Number</th>
+                    <th>Tasks Reviewed</th>
+                    <th>Tasks Completed</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for employee in employees %}
+                <tr>
+                    <td>{{ employee[0] }}</td>
+                    <td>{{ employee[1] }}</td>
+                    <td>{{ employee[2] }}</td>
+                    <td>{{ employee[3] }}</td>
+                    <td>{{ employee[4] }}</td>
+                    <td>{{ employee[5] }}</td>
+                    <td>{{ employee[6] }}</td>
+                    <td>
+                        <div class="boxes">
+                        <a class="btn btn-edit" href="{{ url_for('edit_employee_page', employee_id=employee[0]) }}">Edit</a>
+                        <form action="{{ url_for('delete_employee', employee_id=employee.employee_id) }}" method="post" style="display:inline;">
+
+                            <input type="hidden" name="employee_id" value="{{ employee[0] }}">
+                            <button type="submit" class="btn btn-delete">Delete</button>
+                        </form>
+                    </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var closeButtons = document.querySelectorAll('.flash-messages .close');
+    
+            closeButtons.forEach(function (button) {
+                button.addEventListener('click', function () {
+                    // Hide the parent flash message element when the close button is clicked
+                    var flashMessage = button.closest('.flash-messages');
+                    if (flashMessage) {
+                        flashMessage.style.display = 'none';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

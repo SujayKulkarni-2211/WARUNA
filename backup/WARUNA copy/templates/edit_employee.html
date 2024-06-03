@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Employee Data</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            color: #4A90E2;
+            text-decoration: none;
+            font-size: 1.5rem;
+        }
+
+        .login-box {
+            border: 1px solid #4A90E2;
+            padding: 5px 15px;
+            border-radius: 5px;
+            background: #4A90E2;
+            color: white;
+            margin-right: 5px;
+        }
+
+        .login-box a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .boxes {
+            display: flex;
+            margin-right: 20px;
+        }
+
+        .container {
+            width: 400px;
+            margin: 100px auto 50px auto; /* Adjusted for fixed navbar */
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        form {
+            text-align: center;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        input[type="text"], input[type="password"], input[type="email"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus, input[type="password"]:focus, input[type="email"]:focus {
+            border-color: #4a90e2;
+        }
+
+        button[type="submit"] {
+            width: 100%;
+            padding: 12px;
+            background-color: #4a90e2;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            text-transform: uppercase;
+            transition: background-color 0.3s ease;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #357ae8;
+        }
+
+        .flash-messages {
+            background-color: #28a745;
+            color: #fff;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+
+        .flash-messages ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .flash-messages .close {
+            color: #fff;
+            float: right;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .flash-messages .close:hover {
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a class="navbar-brand" href="#">WARUNA</a>
+        <div class="boxes">
+            <div class="login-box"><a class="nav-link" href="/dashboard">Dashboard</a></div>
+            <div class="login-box"><a class="nav-link" href="/logout">Logout</a></div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>Edit Employee</h1>
+
+        <!-- Flash messages -->
+        {% with messages = get_flashed_messages(with_categories=True) %}
+        {% if messages %}
+        <div id="flash-messages" class="flash-messages">
+            <ul>
+                {% for category, message in messages %}
+                <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <form action="{{ url_for('edit_employee_page', employee_id=employee['employee_id']) }}" method="post">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" value="{{ employee['name'] }}" required>
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" value="{{ employee['password'] }}" required>
+
+            <label for="role">Role:</label>
+            <input type="text" id="role" name="role" value="{{ employee['role'] }}" required>
+
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" value="{{ employee['email'] }}" required>
+
+            <label for="mobile_number">Mobile Number:</label>
+            <input type="text" id="mobile_number" name="mobile_number" value="{{ employee['mobile_no'] }}" required>
+
+            <label for="tasks_reviewed">Tasks Reviewed:</label>
+            <input type="text" id="tasks_reviewed" name="tasks_reviewed" value="{{ employee['tasks_reviewed'] }}" required>
+
+            <label for="tasks_completed">Tasks Completed:</label>
+            <input type="text" id="tasks_completed" name="tasks_completed" value="{{ employee['tasks_completed'] }}" required>
+
+            <button type="submit">Update Employee</button>
+        </form>
+    </div>
+</body>
+</html>
