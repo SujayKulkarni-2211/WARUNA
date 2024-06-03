@@ -1,0 +1,10 @@
+Issue ID: 1202
+Inspector ID: inspector3
+Inspector Name: Sujay
+Issue Description: well is dry
+Observations: well is dry
+Actions Taken: Actions taken
+Recommendations: done
+Date of Inspection: 2024-06-03
+Status Update: action_taken
+

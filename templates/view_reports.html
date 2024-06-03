@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>View Reports</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f8ff; /* Light blue background */
+            color: #333; /* Dark text */
+            padding: 20px;
+            margin: 0;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0 auto;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        th, td {
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background-color: #6fabee;
+            color: white;
+            text-transform: uppercase;
+            font-size: 14px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2; /* Light grey background for even rows */
+        }
+
+        tr:nth-child(odd) {
+            background-color: #ffffff; /* White background for odd rows */
+        }
+
+        tr:hover {
+            background-color: #e9f5e9; /* Light green background on hover */
+        }
+
+        .button {
+            padding: 8px 12px;
+            background-color: #56a5ff;
+            border: none;
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .button:hover {
+            background-color: #025bc0;
+        }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            color: #4A90E2;
+            text-decoration: none;
+            font-size: 1.5rem;
+        }
+
+        .login-box {
+            border: 1px solid #4A90E2;
+            padding: 5px 15px;
+            border-radius: 5px;
+            background: #4A90E2;
+            color: white;
+            margin-right: 5px;
+        }
+
+        .login-box a {
+            color: white;
+            text-decoration: none;
+        }
+        .boxes{
+            display: flex;
+        }
+        .flash-messages {
+            background-color: #28a745;
+            color: #fff;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+    
+        .flash-messages ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+    
+        .flash-messages .close {
+            color: #fff;
+            float: right;
+            font-size: 20px;
+            cursor: pointer;
+        }
+    
+        .flash-messages .close:hover {
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-light">
+        <a class="navbar-brand" href="#">WARUNA</a>
+        <div class="boxes">
+        <div class="login-box"><a class="nav-link" href="/dashboard">Dashboard</a></div>
+        <div class="login-box"><a class="nav-link" href="/logout">Logout</a></div>
+        </div>
+    </nav>
+     <!-- Flash messages -->
+     {% with messages = get_flashed_messages() %}
+     {% if messages %}
+     <div id="flash-messages" class="flash-messages">
+         <ul>
+             {% for message in messages %}
+             <li>
+                 <span class="close">&times;</span>
+                 {{ message }}
+             </li>
+             {% endfor %}
+         </ul>
+     </div>
+     {% endif %}
+     {% endwith %}
+
+    <h1>Reports</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Issue ID</th>
+                <th>Issue Description</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for report in reports %}
+                <tr>
+                    <td>{{ report[0] }}</td>
+                    <td>{{ report[1] }}</td>
+                    <td>
+                        <a href="{{ url_for('view_report_text', issue_id=report[0]) }}" class="button">View Report</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var closeButtons = document.querySelectorAll('.flash-messages .close');
+    
+            closeButtons.forEach(function (button) {
+                button.addEventListener('click', function () {
+                    // Hide the parent flash message element when the close button is clicked
+                    var flashMessage = button.closest('.flash-messages');
+                    if (flashMessage) {
+                        flashMessage.style.display = 'none';
+                    }
+                });
+            });
+        });
+    </script>
+    
+</body>
+</html>
+

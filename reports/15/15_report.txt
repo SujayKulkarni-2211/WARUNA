@@ -1,0 +1,10 @@
+Issue ID: 15
+Inspector ID: inspector3
+Inspector Name: Sujay
+Issue Description: Low Pressure:Pressure level is too low: 16.391350358973916
+Observations: Low Pressure:Pressure level is too low: 16.391350358973916
+Actions Taken: Low Pressure:Pressure level is too low: 16.391350358973916
+Recommendations: Low Pressure:Pressure level is too low: 16.391350358973916
+Date of Inspection: 2024-06-03
+Status Update: inspected
+

@@ -1,7 +1,7 @@
 #SIH1423
 
 import sqlite3
-from flask import Flask, render_template, request, flash, redirect, url_for, session, send_from_directory, current_app, jsonify
+from flask import Flask, render_template, request, flash, redirect, url_for, session, send_from_directory, current_app, jsonify, send_file
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -764,11 +764,11 @@ def download_iot_data():
 @app.route('/geospatial_graphs')
 def geospatial_graphs():
     # Paths to the pre-generated geospatial data graphs
-    map_graph_path = 'static/geospatial_map_graph.html'
-    heatmap_path = 'static/geospatial_heatmap.png'
-    infrastructure_distribution_path = 'static/geospatial_infrastructure_distribution.png'
-    infrastructure_per_terrain_path = 'static/geospatial_infrastructure_per_terrain.png'
-    infrastructure_per_water_source_path = 'static/geospatial_infrastructure_per_water_source.png'
+    map_graph_path = 'static/images/geospatial_map_graph.html'
+    heatmap_path = 'static/images/geospatial_heatmap.png'
+    infrastructure_distribution_path = 'static/images/geospatial_infrastructure_distribution.png'
+    infrastructure_per_terrain_path = 'static/images/geospatial_infrastructure_per_terrain.png'
+    infrastructure_per_water_source_path = 'static/images/geospatial_infrastructure_per_water_source.png'
 
     return render_template('geospatial_graphs.html',
                            map_graph_path=map_graph_path,
@@ -784,10 +784,10 @@ def download_geospatial_data():
 @app.route('/download_gs_pdf')
 def download_gs_pdf():
     images = [
-        "static/geospatial_heatmap.png",
-        "static/geospatial_infrastructure_distribution.png",
-        "static/geospatial_infrastructure_per_terrain.png",
-        "static/geospatial_infrastructure_per_water_source.png"
+        "static/images/geospatial_heatmap.png",
+        "static/images/geospatial_infrastructure_distribution.png",
+        "static/images/geospatial_infrastructure_per_terrain.png",
+        "static/images/geospatial_infrastructure_per_water_source.png"
     ]
     
     pdf_path = "static/geospatial_graphs.pdf"
@@ -813,6 +813,150 @@ def create_gs_pdf(image_paths, output_path):
 @app.route('/botwarunacharya')
 def botwarunacharya():
     return redirect('https://mediafiles.botpress.cloud/c006a2d3-274b-4e5b-8567-37eb08511cce/webchat/bot.html')
+
+@app.route('/view_reports')
+def view_reports():
+    conn = sqlite3.connect('waruna.db')
+    c = conn.cursor()
+    c.execute("SELECT issue_id, issue_description, report_path FROM inspector_reports")
+    reports = c.fetchall()
+    conn.close()
+    return render_template('view_reports.html', reports=reports)
+
+@app.route('/view_report_text/<int:issue_id>')
+def view_report_text(issue_id):
+    # Connect to the database
+    conn = sqlite3.connect('waruna.db')
+    cursor = conn.cursor()
+
+    # Fetch the report details based on issue_id
+    cursor.execute("SELECT * FROM inspector_reports WHERE issue_id = ?", (issue_id,))
+    report = cursor.fetchone()  # Assuming there's only one report per issue_id
+
+    # Close the database connection
+    conn.close()
+
+    # Check if a report is found
+    if report:
+        # Read the content of the report text file
+        report_text_path = f"reports/{issue_id}/{issue_id}_report.txt"
+        try:
+            with open(report_text_path, 'r') as report_file:
+                report_text = report_file.read()
+        except FileNotFoundError:
+            report_text = "Report text file not found."
+
+        # Return the report details and text to the template
+        return render_template('view_report_text.html', report=report, report_text=report_text)
+    else:
+        # If no report is found, return an error message or handle it as needed
+        return "Report not found"
+
+@app.route('/view_report_image/<int:issue_id>')
+def view_report_image(issue_id):
+    image_path = f"reports/{issue_id}/{issue_id}.jpg"
+    return render_template('view_report_image.html', image_path=image_path)
+
+@app.route('/view_report_data/<int:issue_id>')
+def view_report_data(issue_id):
+    data_path = f"reports/{issue_id}/{issue_id}.csv"
+    try:
+        return send_file(data_path, as_attachment=True)
+    except FileNotFoundError:
+        return "Data file not found."
+
+@app.route('/reassign_task/<int:issue_id>')
+def reassign_task(issue_id):
+    # Remove the issue_id row from the assigned_tasks table
+    conn = sqlite3.connect('waruna.db')
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM assigned_tasks WHERE issue_id = ?", (issue_id,))
+    conn.commit()
+
+    # Remove the issue_id row from the submitted reports
+    cursor.execute("DELETE FROM inspector_reports WHERE issue_id = ?", (issue_id,))
+    conn.commit()
+
+    cursor.execute("UPDATE reported_problems SET status = NULL, assigned_to = NULL WHERE id = ?", (issue_id,))
+    conn.commit()
+
+    conn.close()
+    flash("Task set to re-assign",'success')
+    return redirect(url_for('view_reports'))
+
+@app.route('/approve_task/<int:issue_id>')
+def approve_task(issue_id):
+    # Remove the issue_id row from the assigned_tasks table
+    conn = sqlite3.connect('waruna.db')
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM assigned_tasks WHERE issue_id = ?", (issue_id,))
+    conn.commit()
+
+    # Remove the issue_id row from the submitted reports
+    cursor.execute("DELETE FROM inspector_reports WHERE issue_id = ?", (issue_id,))
+    conn.commit()
+
+    # Increment tasks_completed by 1 for the particular inspector
+    inspector_id = session.get('employee_id')
+    cursor.execute("UPDATE employees SET tasks_completed = tasks_completed + 1 WHERE employee_id = ?", (inspector_id,))
+    conn.commit()
+    cursor.execute("UPDATE reported_problems SET status = ? WHERE id = ?", ('completed',issue_id,))
+    conn.commit()
+    cursor.execute("SELECT * FROM reported_problems WHERE id = ?", (issue_id,))
+    result = cursor.fetchone()
+
+    conn.commit()
+    conn.close()
+
+    if result and result[6]:  # Check if result is not None and email is not None/empty
+        send_completion_email(result)
+    flash("Marked as completed",'success')
+    return redirect(url_for('view_reports'))
+
+def send_completion_email(issue_details):
+    sender_email = "mails.waruna@gmail.com"
+    sender_password = "wysf pclq rfwl uivo"
+    recipient_email = issue_details[6]  
+
+    subject = "Task Approval Notification"
+    body = f"""
+    Your reported problem with the following details has been approved and marked as completed:
+
+    Issue ID: {issue_details[0]}
+    Location: {issue_details[1]}
+    Landmark: {issue_details[2]}
+    Location Description: {issue_details[3]}
+    Issue Description: {issue_details[5]}
+    Email: {issue_details[6]}
+    Date: {issue_details[7]}
+    Status: {issue_details[11]}
+    Please review and if any queries get back to us at our mail - mails.waruna@gmail.com you can also re report the issue if you are not satisfied.
+    Please do let us know your feedback at mails.waruna@gmailcom.
+    """
+
+    # Create the email
+    msg = MIMEMultipart()
+    msg['From'] = sender_email
+    msg['To'] = recipient_email
+    msg['Subject'] = subject
+    msg.attach(MIMEText(body, 'plain'))
+
+    try:
+        # Connect to the server
+        server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+    
+        server.login(sender_email, sender_password)
+
+        # Send the email
+        server.sendmail(sender_email, recipient_email, msg.as_string())
+
+        # Disconnect from the server
+        server.quit()
+
+        print(f"Email sent to {recipient_email}")
+    except Exception as e:
+        print(f"Failed to send email: {e}")
+
 
 if __name__ == "__main__":
     app.run(debug=True)
