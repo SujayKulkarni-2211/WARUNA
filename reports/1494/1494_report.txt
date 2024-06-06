@@ -1,0 +1,10 @@
+Issue ID: 1494
+Inspector ID: inspector1
+Inspector Name: Inspector 1
+Issue Description: leakage
+Observations: done
+Actions Taken: done
+Recommendations: done
+Date of Inspection: 2024-06-04
+Status Update: inspected
+

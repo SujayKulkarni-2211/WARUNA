@@ -16,7 +16,7 @@ app.config['UPLOAD_FOLDER'] = 'static/images'
 app.secret_key = 'bramharoopasaraswati108'
 
 # Function to create SQLite database and tables
-# Function to create SQLite database and tables
+
 def create_tables():
     conn = sqlite3.connect('waruna.db')
     c = conn.cursor()
@@ -27,7 +27,7 @@ def create_tables():
     c.execute('''CREATE TABLE IF NOT EXISTS employees
                  (employee_id TEXT PRIMARY KEY, name TEXT, password TEXT, role TEXT,
                  email TEXT, mobile_no TEXT, tasks_reviewed INTEGER DEFAULT 0,
-                 tasks_completed INTEGER DEFAULT 0)''')  # Add name column
+                 tasks_completed INTEGER DEFAULT 0)''')  
 
     # Create a table for assigned tasks
     c.execute('''CREATE TABLE IF NOT EXISTS assigned_tasks
@@ -99,11 +99,11 @@ def login():
         conn.close()
 
         if user:
-            stored_password = user[2]  # Assuming password is in the third column (index 2)
+            stored_password = user[2]  
             if password == stored_password:
                 session['employee_id'] = employee_id
-                session['role'] = user[3]  # Store role in session (index 3 is role)
-                session['name'] = user[1]  # Store name in session (index 1 is name)
+                session['role'] = user[3]  
+                session['name'] = user[1]  
                 flash('Login successful!', 'success')
                 return redirect(url_for('dashboard'))
             else:
@@ -117,6 +117,7 @@ def login():
 
     return render_template('login.html')
 
+# Function to render dashboard based on role
 
 @app.route('/dashboard')
 def dashboard():
@@ -136,7 +137,6 @@ def logout():
     flash('You have been logged out', 'success')
     return redirect(url_for('login'))
 
-# Function to render dashboard based on role
 
 
 # Function to submit a reported issue
@@ -854,14 +854,41 @@ def view_report_text(issue_id):
 
 @app.route('/view_report_image/<int:issue_id>')
 def view_report_image(issue_id):
-    image_path = f"reports/{issue_id}/{issue_id}.jpg"
-    return render_template('view_report_image.html', image_path=image_path)
+    conn = sqlite3.connect('waruna.db')
+    c = conn.cursor()
+    c.execute("SELECT image_path FROM inspector_reports WHERE issue_id = ?", (issue_id,))
+    result = c.fetchone()
+    conn.close()
+
+    if result and result[0]:
+        image_location = result[0]
+        # Check if the image exists in the specified location
+        if os.path.exists(image_location):
+            return send_from_directory(os.path.dirname(image_location), os.path.basename(image_location))
+        else:
+            # Image does not exist, serve a default image
+            return send_from_directory('static/images', 'noimgavailable.jpeg')
+    else:
+        # No image location found in the database, serve a default image
+        return send_from_directory('static/images', 'noimgavailable.jpeg')
 
 @app.route('/view_report_data/<int:issue_id>')
 def view_report_data(issue_id):
-    data_path = f"reports/{issue_id}/{issue_id}.csv"
+    conn = sqlite3.connect('waruna.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT data_path FROM inspector_reports WHERE issue_id = ?", (issue_id,))
+    data_path = cursor.fetchone()
+    conn.close()
+    
+    if data_path is None:
+        return "Data file not found in the database."
+
+    data_path = data_path[0]  # Extract the first item from the tuple
+
     try:
-        return send_file(data_path, as_attachment=True)
+        directory = os.path.dirname(data_path)
+        filename = os.path.basename(data_path)
+        return send_from_directory(directory=directory, path=filename, as_attachment=False)
     except FileNotFoundError:
         return "Data file not found."
 
